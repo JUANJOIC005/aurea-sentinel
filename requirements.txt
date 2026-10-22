@@ -1,0 +1,12 @@
+# Dependencias de AUREA Sentinel (Python 3.12 o superior).
+# En Debian 13 todo está en apt: python3-pyside6.qtwidgets python3-pyside6.qtsvg python3-fastapi
+# python3-uvicorn python3-psycopg python3-argon2 python3-httpx python3-pytest python3-pytest-cov postgresql
+# Con pip (entorno virtual):  python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+PySide6>=6.8
+fastapi>=0.115
+uvicorn>=0.32
+psycopg[binary]>=3.2
+argon2-cffi>=21.1
+httpx>=0.28
+pytest>=8.3
+pytest-cov>=5.0
