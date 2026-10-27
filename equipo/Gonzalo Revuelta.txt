@@ -1,0 +1,5 @@
+Nombre: Gonzalo Revuelta
+Usuario de GitHub: gr42906
+Tarea asignada en el Sprint 1: T03
+Tareas del Sprint 1: T03, T06
+Proyecto: AUREA Sentinel (equipo AUREA AUDIT)
