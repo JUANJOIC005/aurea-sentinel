@@ -1,0 +1,23 @@
+name: Ejecutable de Windows
+
+# Construye "AUREA Sentinel.exe" en un Windows de GitHub y lo deja descargable en la pestaña Actions.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements.txt pillow
+      - run: python -m pytest -q
+      - run: pyinstaller aurea_sentinel.spec
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AUREA Sentinel (Windows)
+          path: dist/AUREA Sentinel.exe
