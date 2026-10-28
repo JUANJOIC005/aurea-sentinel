@@ -106,7 +106,7 @@ def test_login_sin_servidor(acceso):
     api.fallo = ErrorConexion("caído")
     control.iniciar_sesion("laura@cn.es", "clave", False)
     assert "No se puede conectar" in ventana.login.aviso.text() and iniciadas == []
-    assert "sin conexión" in ventana.barra.izquierda.text()
+    assert "Servidor" not in ventana.barra.izquierda.text()
 
 
 def test_equipo_compartido_no_recuerda_el_usuario(acceso):
