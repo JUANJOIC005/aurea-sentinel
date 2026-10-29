@@ -47,17 +47,6 @@ pkexec apt install -y python3-pyside6.qtwidgets python3-pyside6.qtsvg python3-fa
   python3-uvicorn python3-argon2 python3-httpx python3-pytest-cov
 ```
 
-**Comandos de desarrollo** (desde la carpeta del proyecto, con `./run.sh`):
-
-| Comando | Qué hace |
-|---|---|
-| `./run.sh cliente` | Abre la aplicación de escritorio (con su base de datos local) |
-| `./run.sh simulador` | Genera una lectura de los 36 sensores cada 5 s |
-| `./run.sh bd --desde-cero` | Borra la base de datos y la recrea con las migraciones |
-| `./run.sh bd` | Aplica solo las migraciones que falten |
-| `./run.sh demo` | Crea las 18 cuentas de demostración (si faltan) |
-| `./run.sh pruebas` | Pasa las pruebas con informe de cobertura |
-
 ### Base de datos
 
 Un único archivo SQLite: `~/.local/share/AUREA Sentinel/aurea sentinel.db` en Linux y `%APPDATA%\AUREA Sentinel\aurea sentinel.db` en Windows (se cambia con la variable `AUREA_BD`). Se crea y se actualiza sola al abrir la aplicación con las migraciones de `servidor/migrations/`. Para empezar de cero basta con borrar el archivo (o `./run.sh bd --desde-cero`).
