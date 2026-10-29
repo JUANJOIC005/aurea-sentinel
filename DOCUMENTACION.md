@@ -11,7 +11,7 @@ Las tareas T01 a T10 del backlog están hechas, probadas y fusionadas en `main` 
 | Tarea | Qué es | Estado |
 |---|---|---|
 | T01 | Repositorio, ramas y Kanban | Repositorio en GitHub con `main`, `develop` y `production`, plantillas de issues y de pull request, 4 hitos (sprints), etiquetas, las 20 tareas del backlog como issues (#1 a #20) y el tablero Kanban en GitHub Projects |
-| T02 | Esqueleto MVC | Hecho. Ventanas (modelo, vista, controlador), módulo de datos, simulador, configuración por variables de entorno y `./run.sh` |
+| T02 | Esqueleto MVC | Hecho. Ventanas (modelo, vista, controlador), módulo de datos, simulador, configuración por variables de entorno |
 | T03 | Base de datos y migraciones | Hecho. 10 tablas (más la de control de migraciones), 9 áreas, 4 roles y 36 sensores. Se crea desde cero con un comando |
 | T04 | Login con Argon2id y sesión | Hecho, con bloqueo a los 5 intentos |
 | T05 | Registro pendiente | Hecho |
@@ -49,7 +49,7 @@ pkexec apt install -y python3-pyside6.qtwidgets python3-pyside6.qtsvg python3-fa
 
 ### Base de datos
 
-Un único archivo SQLite: `~/.local/share/AUREA Sentinel/aurea sentinel.db` en Linux y `%APPDATA%\AUREA Sentinel\aurea sentinel.db` en Windows (se cambia con la variable `AUREA_BD`). Se crea y se actualiza sola al abrir la aplicación con las migraciones de `servidor/migrations/`. Para empezar de cero basta con borrar el archivo (o `./run.sh bd --desde-cero`).
+Un único archivo SQLite: `~/.local/share/AUREA Sentinel/aurea sentinel.db` en Linux y `%APPDATA%\AUREA Sentinel\aurea sentinel.db` en Windows (se cambia con la variable `AUREA_BD`). Se crea y se actualiza sola al abrir la aplicación con las migraciones de `servidor/migrations/`. Para empezar de cero basta con borrar el archivo.
 
 ### Cómo se construye el `.exe`
 
@@ -106,7 +106,6 @@ Pendiente de seguridad, ya previsto en el backlog: doble factor (Sprint 2, T11) 
 aurea-sentinel/
 ├── aurea_sentinel.py       punto de entrada del .exe (aplicación o --simulador)
 ├── aurea_sentinel.spec     receta de PyInstaller
-├── run.sh                  comandos del proyecto
 ├── requirements.txt · pytest.ini · .env.example   dependencias, configuración de las pruebas y plantilla de ajustes
 ├── servidor/               módulo de datos interno (el nombre de la carpeta es histórico)
 │   ├── local.py            prepara la base de datos y activa el módulo dentro de la aplicación
@@ -198,7 +197,7 @@ Regla general para implementarlo: en cada petición el módulo de datos comprueb
 
 ## 7. Pruebas (T10)
 
-`./run.sh pruebas` → **144 pruebas en verde, 92 % de cobertura**. Los modelos y controladores del cliente y del módulo de datos están entre el 85 % y el 100 %. Lo que queda sin probar son los arranques por línea de comandos (`migrate`, `simulador`, `datos_demo`, `config`), que se han ejecutado a mano.
+**144 pruebas en verde, 92 % de cobertura**. Los modelos y controladores del cliente y del módulo de datos están entre el 85 % y el 100 %. Lo que queda sin probar son los arranques por línea de comandos (`migrate`, `simulador`, `datos_demo`, `config`), que se han ejecutado a mano.
 
 | Archivo | Qué comprueba |
 |---|---|
@@ -218,7 +217,7 @@ Las pruebas **nunca tocan los datos del usuario**: usan una base SQLite temporal
 
 ## 8. Prueba hecha a mano
 
-Con el módulo de datos y la base de datos reales (y, tras el cambio a aplicación local, con el ejecutable empaquetado en Linux, que arranca, crea su base con las 18 cuentas y escribe lecturas con `--simulador`): login de un técnico (devuelve nombre, rol, área y supervisor), login con contraseña mala (mensaje neutro), 3 ciclos del simulador (108 lecturas de 36 sensores) y capturas de las ventanas generadas con la aplicación real para compararlas con los mockups. Las capturas se hicieron en modo sin pantalla; la aplicación sí se ha abierto en pantalla real, en Debian con `./run.sh cliente` y en Windows con el `.exe` (pantalla de acceso).
+Con el módulo de datos y la base de datos reales (y, tras el cambio a aplicación local, con el ejecutable empaquetado en Linux, que arranca, crea su base con las 18 cuentas y escribe lecturas con `--simulador`): login de un técnico (devuelve nombre, rol, área y supervisor), login con contraseña mala (mensaje neutro), 3 ciclos del simulador (108 lecturas de 36 sensores) y capturas de las ventanas generadas con la aplicación real para compararlas con los mockups. Las capturas se hicieron en modo sin pantalla; la aplicación sí se ha abierto en pantalla real, en Debian y en Windows con el `.exe` (pantalla de acceso).
 
 ---
 
