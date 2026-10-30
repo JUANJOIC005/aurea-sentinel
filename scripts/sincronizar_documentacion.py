@@ -1,11 +1,3 @@
-"""Copia DOCUMENTACION.md como anexo del anteproyecto y de la memoria.
-
-    python3 scripts/sincronizar_documentacion.py [carpeta_del_proyecto]
-
-DOCUMENTACION.md es la única fuente. En el anteproyecto y en la memoria, el anexo vive entre las marcas
-<!-- DOCUMENTACION:inicio --> y <!-- DOCUMENTACION:fin -->; este script lo reescribe (no editar a mano).
-Los títulos se numeran con el prefijo del anexo: «## 3. Cómo se usa» pasa a «## A.3 Cómo se usa».
-"""
 import re
 import sys
 from pathlib import Path
@@ -19,7 +11,7 @@ def como_anexo(texto: str) -> str:
     salida = []
     for linea in texto.splitlines():
         if linea.startswith("# "):
-            continue                                            # el título general lo pone el anexo
+            continue
         linea = re.sub(r"^(#{2,3}) (\d+(?:\.\d+)*)\.? ", r"\1 A.\2 ", linea)
         salida.append(linea)
     return "\n".join(salida).strip()

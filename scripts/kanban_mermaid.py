@@ -1,9 +1,3 @@
-"""Tablero Kanban del Sprint 1 como diagrama Mermaid (para el .md), leído de GitHub Projects.
-
-    python3 scripts/kanban_mermaid.py [AAAA-MM-DDTHH:MM:SSZ] > kanban.md
-
-Con la fecha (UTC) reconstruye el tablero en ese momento a partir del historial de GitHub.
-"""
 import sys
 
 from kanban_captura import COLUMNAS, REPO_NOMBRE, REPO_PROPIETARIO, leer_tablero

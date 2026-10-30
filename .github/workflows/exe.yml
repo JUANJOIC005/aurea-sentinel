@@ -1,6 +1,5 @@
 name: Ejecutable de Windows
 
-# Construye "AUREA Sentinel.exe" en un Windows de GitHub y lo deja descargable en la pestaña Actions.
 on:
   workflow_dispatch:
   push:

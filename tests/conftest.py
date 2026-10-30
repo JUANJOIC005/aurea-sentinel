@@ -1,28 +1,22 @@
-"""Preparación común de las pruebas.
-
-Las pruebas usan una base de datos temporal propia (AUREA_BD apunta a una carpeta temporal):
-se recrea desde cero antes de cada prueba, así que nunca tocan los datos del usuario.
-"""
 import os
 import tempfile
 
 os.environ["AUREA_BD"] = os.path.join(tempfile.mkdtemp(prefix="aurea-bd-"), "pruebas.db")
 os.environ["QT_QPA_PLATFORM"] = "offscreen"
-os.environ["XDG_CONFIG_HOME"] = tempfile.mkdtemp(prefix="aurea-config-")  # QSettings no toca los del usuario
+os.environ["XDG_CONFIG_HOME"] = tempfile.mkdtemp(prefix="aurea-config-")
 
-import pytest  # noqa: E402
-from fastapi.testclient import TestClient  # noqa: E402
+import pytest
+from fastapi.testclient import TestClient
 
-from servidor import db, migrate, seguridad  # noqa: E402
-from servidor.api.main import app  # noqa: E402
+from servidor import db, migrate, seguridad
+from servidor.api.main import app
 
 CLAVE = "Valdecierzo-2026-ok!"
-HASH_CLAVE = seguridad.hashear(CLAVE)   # se calcula una vez: Argon2 es lento a propósito
+HASH_CLAVE = seguridad.hashear(CLAVE)
 
 
 @pytest.fixture(autouse=True)
 def base_de_datos():
-    """Cada prueba empieza con la base recién creada: catálogo de áreas y sensores, sin usuarios ni lecturas."""
     migrate.desde_cero()
     migrate.preparar()
 
@@ -55,7 +49,6 @@ def crear_usuario(conexion):
 
 @pytest.fixture
 def entrar(api):
-    """Inicia sesión por la API y devuelve (token, respuesta)."""
     def _entrar(correo="laura.mendez@cn-valdecierzo.es", password=CLAVE):
         r = api.post("/auth/login", json={"correo": correo, "password": password})
         assert r.status_code == 200, r.text
