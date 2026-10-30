@@ -1,5 +1,7 @@
 Nombre: Sergio García
 Usuario de GitHub: sergiogarciagallegocasilda-hash
-Tarea asignada en el Sprint 1: T02
+Tarea asignada en este momento: T11 (Permisos por rol y área + doble factor)
+Rama de trabajo: tarea/T11
 Tareas del Sprint 1: T02, T04, T05
+Siguiente tarea asignada: T15
 Proyecto: AUREA Sentinel (equipo AUREA AUDIT)
