@@ -1,7 +1,3 @@
-"""Dibuja los diagramas UML del anteproyecto (casos de uso, clases, secuencia y base de datos).
-
-    python3 scripts/diagramas_uml.py <carpeta_salida>
-"""
 import sys
 from pathlib import Path
 
@@ -44,7 +40,6 @@ def alto_clase(atributos=(), metodos=(), estereotipo=None):
 
 
 def clase(ax, x, y, w, titulo, atributos=(), metodos=(), estereotipo=None):
-    """Rectángulo UML de tres partes. (x, y) es la esquina superior izquierda. Devuelve el alto."""
     h_t, h_a, h_m, alto_l = medidas(atributos, metodos, estereotipo)
     alto = h_t + h_a + h_m
     ax.add_patch(Rectangle((x, y - alto), w, alto, fc="white", ec=NEGRO, lw=1))
@@ -130,17 +125,14 @@ def clases(salida):
         cajas[nombre] = (x, y, w, h)
         return y - h - huecos
 
-    # Columna 1: vista y controladores
     y = 84
     y = pon("va", 2, y, 30, "VentanaAcceso", ["vista_login", "vista_registro"], ["mostrar_login()", "mostrar_registro()"], "vista")
     y = pon("ca", 2, y, 30, "ControladorAcceso", ["api", "sesion"], ["entrar(correo, clave)", "registrar(datos)"], "controlador")
     y = pon("cs", 2, y, 30, "ControladorSesion", ["sesion", "temporizador"], ["cerrar()", "comprobar_caducidad()"], "controlador")
-    # Columna 2: modelo
     y = 84
     y = pon("api", 42, y, 32, "ClienteApi", ["url_base", "token"], ["login(correo, clave)", "registro(datos)", "yo()", "logout()"], "modelo")
     y = pon("ses", 42, y, 32, "Sesion", ["usuario", "token", "caduca_en"], ["esta_activa()", "secciones_menu()"], "modelo")
     y = pon("usu", 42, y, 32, "Usuario", ["nombre", "correo", "rol", "area"], [], "modelo")
-    # Columna 3: servidor
     y = 84
     y = pon("rt", 88, y, 36, "api (FastAPI)", [], ["POST /auth/login", "POST /auth/registro", "GET  /auth/yo", "POST /auth/logout"], "rutas")
     y = pon("us", 88, y, 36, "usuarios", [], ["por_correo()", "anotar_fallo()", "crear_pendiente()"], "módulo")

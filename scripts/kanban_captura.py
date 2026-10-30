@@ -1,12 +1,3 @@
-"""Captura del tablero Kanban del Sprint 1, generada desde GitHub Projects.
-
-    python3 scripts/kanban_captura.py <salida.png> "Captura de final de sprint" [AAAA-MM-DDTHH:MM:SSZ]
-
-Lee las issues del hito «Sprint 1» y la columna (Status) de cada una en el proyecto, y dibuja el tablero.
-Con la fecha opcional (UTC) reconstruye el tablero tal y como estaba en ese momento a partir del historial
-de cambios de columna que guarda GitHub, y lo indica en la cabecera.
-Necesita `gh` con sesión iniciada y permiso `project`.
-"""
 import json
 import os
 import re
@@ -119,7 +110,7 @@ def dibujar(tablero: dict, etiqueta: str, salida: str, fecha: datetime | None = 
 
 if __name__ == "__main__":
     if len(sys.argv) not in (3, 4):
-        sys.exit(__doc__)
+        sys.exit("Uso: python3 scripts/kanban_captura.py <salida.png> \"texto\" [AAAA-MM-DDTHH:MM:SSZ]")
     en = sys.argv[3] if len(sys.argv) == 4 else None
     tablero = leer_tablero(en)
     fecha = datetime.fromisoformat(en.replace("Z", "+00:00")).astimezone().replace(tzinfo=None) if en else None

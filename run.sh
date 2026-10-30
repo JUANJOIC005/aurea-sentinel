@@ -1,11 +1,4 @@
 #!/usr/bin/env bash
-# Comandos del proyecto:  ./run.sh <servidor|cliente|simulador|bd|demo|pruebas> [opciones]
-#   bd [--desde-cero]   crea o actualiza la base de datos local (SQLite) con las migraciones
-#   demo                crea las cuentas de demostración (18 usuarios)
-#   servidor            arranca la API suelta (la aplicación ya lleva la suya)
-#   simulador           genera lecturas de los 36 sensores
-#   cliente             abre la aplicación de escritorio (con su servidor y su base de datos locales)
-#   pruebas             pruebas con informe de cobertura
 set -euo pipefail
 cd "$(dirname "$0")"
 [ -f .env ] && { set -a; . ./.env; set +a; }
