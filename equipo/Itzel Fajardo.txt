@@ -1,0 +1,5 @@
+Nombre: Itzel Fajardo
+Usuario de GitHub: itzel1204
+Tarea asignada en el Sprint 1: T10
+Tareas del Sprint 1: T01, T09, T10
+Proyecto: AUREA Sentinel (equipo AUREA AUDIT)
