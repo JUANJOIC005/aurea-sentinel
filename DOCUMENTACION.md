@@ -29,7 +29,7 @@ Las tareas T01 a T10 del backlog están hechas, probadas y fusionadas en `main` 
 
 AUREA Sentinel es una **aplicación totalmente local**: un único programa que funciona en el propio equipo, con su base de datos SQLite en un archivo. No usa servicios externos, ni la nube, ni conexión a internet, y no hay que instalar, contratar ni configurar ningún servidor. La parte que atiende las peticiones (`servidor/`) es un módulo interno del programa: solo responde al propio equipo (`127.0.0.1`) y se para al cerrar la aplicación.
 
-**Para usarla (Windows):** descargar `AUREA.Sentinel.exe` de la sección *Releases* del repositorio (versión `v0.1.0`) y abrirlo con doble clic. La primera vez crea su base de datos en `%APPDATA%\AUREA Sentinel\` y las 18 cuentas de demostración. El `.exe` no está firmado digitalmente: Windows (SmartScreen o Defender) puede avisar la primera vez; hay que elegir «Más información → Ejecutar de todas formas». Lo construye GitHub Actions (`.github/workflows/exe.yml`) con Python 3.14.
+**Para usarla (Windows):** descargar `AUREA Sentinel.exe` de la rama `production` del repositorio (o `AUREA.Sentinel.exe` de la sección *Releases*, versión `v0.1.0`) y abrirlo con doble clic. La primera vez crea su base de datos en `%APPDATA%\AUREA Sentinel\` y las 18 cuentas de demostración. El `.exe` no está firmado digitalmente: Windows (SmartScreen o Defender) puede avisar la primera vez; hay que elegir «Más información → Ejecutar de todas formas». Lo construye GitHub Actions (`.github/workflows/exe.yml`) con Python 3.14.
 
 **Para desarrollar (Debian 13):** todo viene de `apt`, sin pip (Debian trae Python 3.13; el `.exe` se construye con 3.14, y el código funciona con ambas).
 
@@ -234,6 +234,8 @@ Con el módulo de datos y la base de datos reales (y, tras el cambio a aplicaci�
 ## 10. GitHub, tablero y acta
 
 **Repositorio:** público, `JUANJOIC005/aurea-sentinel`. Ramas: `main` (versión entregada), `develop` (integración), `production` y una rama `tarea/Txx` por tarea. Cada tarea entró en `develop` con una pull request (#22 a #31) y todo el sprint pasó a `main` con la pull request #32; la etiqueta `v0.1.0` marca la entrega.
+
+**Rama `production`:** contiene el código y el ejecutable ya compilado, `AUREA Sentinel.exe`, para abrirlo sin compilar. La rama `main` es la de pruebas y compilación: al subir a `main`, GitHub Actions pasa las pruebas y construye el `.exe`.
 
 **Scrum Master y entrega:** Juan José Ibáñez es el Scrum Master, lleva el repositorio, es el encargado de fusionar en `main` y entrega el proyecto al profesor.
 
