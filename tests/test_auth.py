@@ -1,4 +1,3 @@
-"""T04 y T10 · Login, bloqueo, sesión y caducidad."""
 import json
 
 from servidor import config
@@ -12,7 +11,6 @@ def login(api, correo=CORREO, password=CLAVE):
     return api.post("/auth/login", json={"correo": correo, "password": password})
 
 
-# ── Login correcto e incorrecto ──
 def test_login_correcto_devuelve_token_nombre_rol_y_area(api, crear_usuario):
     crear_usuario()
     r = login(api)
@@ -58,12 +56,10 @@ def test_campos_vacios_no_son_validos(api):
     assert api.post("/auth/login", json={"correo": "", "password": ""}).status_code == 422
 
 
-# ── Bloqueo tras cinco intentos ──
 def test_bloqueo_tras_cinco_intentos_fallidos(api, crear_usuario, conexion):
     crear_usuario()
     for _ in range(config.INTENTOS_MAXIMOS):
         assert login(api, password="incorrecta-incorrecta").status_code == 401
-    # Con la contraseña buena ya no entra: la cuenta está bloqueada
     r = login(api)
     assert r.status_code == 401 and r.json()["detalle"] == MENSAJE_LOGIN
     fila = conexion.execute("SELECT bloqueado_hasta > datetime('now', '+14 minutes') AS bloqueada FROM usuario").fetchone()
@@ -94,7 +90,6 @@ def test_el_bloqueo_termina_a_los_15_minutos(api, crear_usuario, conexion):
     assert login(api).status_code == 200
 
 
-# ── Cuentas que no pueden entrar ──
 def test_una_cuenta_pendiente_no_puede_iniciar_sesion(api, crear_usuario):
     crear_usuario(estado="pendiente")
     r = login(api)
@@ -108,7 +103,6 @@ def test_cuentas_bloqueadas_o_rechazadas_no_entran(api, crear_usuario):
     assert login(api, "javier@cn.es").status_code == 401
 
 
-# ── Sesión y caducidad ──
 def test_la_sesion_identifica_al_usuario(api, crear_usuario, entrar):
     crear_usuario()
     token, _ = entrar()
@@ -174,7 +168,6 @@ def test_la_contrasena_se_guarda_con_argon2id(crear_usuario, conexion):
     assert conexion.execute("SELECT password_hash FROM usuario").fetchone()["password_hash"].startswith("$argon2id$")
 
 
-# ── Registro de eventos ──
 def test_los_accesos_quedan_en_el_registro_de_auditoria(api, crear_usuario, conexion):
     crear_usuario()
     login(api, password="incorrecta-incorrecta")

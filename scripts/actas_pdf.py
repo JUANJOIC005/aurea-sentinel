@@ -1,9 +1,3 @@
-"""Genera las actas del Sprint 1 en PDF con la plantilla de actas de AUREA AUDIT.
-
-    python3 scripts/actas_pdf.py <carpeta_salida>
-
-Deja en blanco lo que solo saben los asistentes (horas, lugar, quién redacta, asistentes y firmas).
-"""
 import os
 import sys
 from pathlib import Path
@@ -62,7 +56,7 @@ TAREAS = [
 ]
 
 ASISTENTES = ("[&nbsp;&nbsp;] Sergio García (Product Owner) &nbsp; [&nbsp;&nbsp;] Gonzalo Revuelta &nbsp; "
-              "[&nbsp;&nbsp;] Juan José Ibáñez &nbsp; [&nbsp;&nbsp;] Itzel Fajardo (Scrum Master)<br>Otros: ____________")
+              "[&nbsp;&nbsp;] Juan José Ibáñez (Scrum Master) &nbsp; [&nbsp;&nbsp;] Itzel Fajardo<br>Otros: ____________")
 
 
 def acta(numero, titulo, tipo, fecha, orden, desarrollo, hallazgos, acuerdos, estado, proxima, observaciones):

@@ -1,4 +1,3 @@
-"""Modelo del cliente: datos de sesión y comunicación con el servidor."""
 from datetime import datetime, timedelta, timezone
 
 import httpx
@@ -50,7 +49,6 @@ def test_cada_rol_tiene_menu_y_sus_secciones_son_unicas():
         assert claves and len(claves) == len(set(claves)), rol
 
 
-# ── Cliente de la API contra el servidor real (sin red) ──
 @pytest.fixture
 def cliente():
     return ClienteApi(url="http://testserver", http=TestClient(app))

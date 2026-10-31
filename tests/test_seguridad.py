@@ -25,7 +25,7 @@ def test_tokens_unicos_y_hash_estable():
 def test_politica_de_contrasenas():
     assert seguridad.comprobar_politica("Valdecierzo-2026-ok!") == []
     assert seguridad.comprobar_politica("corta")
-    assert seguridad.comprobar_politica("Administrador1")          # lista de filtradas (sin distinguir mayúsculas)
+    assert seguridad.comprobar_politica("Administrador1")
     assert seguridad.comprobar_politica("aaaaaaaaaaaaaaaa")
 
 
