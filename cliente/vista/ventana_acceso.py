@@ -44,7 +44,4 @@ class VentanaAcceso(QMainWindow):
         self.paginas.setCurrentWidget(self.registro)
 
     def actualizar_conexion(self, conectado: bool | None) -> None:
-        estado = {True: "conexión local sin cifrar (desarrollo)", False: "sin conexión con el servidor",
-                  None: "comprobando conexión…"}[conectado]
-        self.barra.poner(conectado, f"Servidor <b>{self._servidor}</b> · {estado} &nbsp;&nbsp; Sin sesión iniciada",
-                         VERSION)
+        self.barra.poner(conectado, "Sin sesión iniciada", VERSION)

@@ -1,4 +1,3 @@
-"""Aplicación local: base de datos SQLite propia y servidor dentro del mismo proceso."""
 import httpx
 
 from cliente.modelo.api import ClienteApi

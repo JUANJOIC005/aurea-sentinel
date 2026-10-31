@@ -1,4 +1,3 @@
-"""Controladores del cliente, con un servidor de mentira para probar cada caso."""
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -21,7 +20,6 @@ def respuesta(rol="supervisor", minutos=15):
 
 
 class FalsaApi:
-    """Hace de servidor: devuelve lo que se le diga o lanza el error que se le pida."""
     servidor = "127.0.0.1:8000"
 
     def __init__(self):
@@ -72,7 +70,6 @@ def acceso(qapp):
     return api, ventana, control, iniciadas
 
 
-# ── Login ──
 def test_login_correcto_emite_la_sesion_y_guarda_el_token(acceso):
     api, ventana, control, iniciadas = acceso
     control.iniciar_sesion("laura@cn.es", "clave", False)
@@ -106,7 +103,7 @@ def test_login_sin_servidor(acceso):
     api.fallo = ErrorConexion("caído")
     control.iniciar_sesion("laura@cn.es", "clave", False)
     assert "No se puede conectar" in ventana.login.aviso.text() and iniciadas == []
-    assert "sin conexión" in ventana.barra.izquierda.text()
+    assert "Servidor" not in ventana.barra.izquierda.text()
 
 
 def test_equipo_compartido_no_recuerda_el_usuario(acceso):
@@ -118,7 +115,6 @@ def test_equipo_compartido_no_recuerda_el_usuario(acceso):
     assert ajustes.value("ultimo_correo") is None
 
 
-# ── Registro ──
 def datos_registro(**cambios):
     base = {"nombre": "Marcos Gil Arroyo", "correo": "marcos@cn.es", "password": "Valdecierzo-2026-ok!",
             "repetir": "Valdecierzo-2026-ok!", "rol": "auditor", "area": None, "supervisor_id": None,
@@ -177,7 +173,7 @@ def test_registro_rechazado_o_sin_servidor(acceso):
 def test_un_tecnico_elige_area_y_despues_supervisor(acceso):
     api, ventana, control, _ = acceso
     control.abrir_registro()
-    ventana.registro.rol.setCurrentIndex(1)           # Técnico de campo
+    ventana.registro.rol.setCurrentIndex(1)
     assert ventana.registro.supervisor.isEnabled()
     assert api.llamadas[-1] == ("supervisores", "A1")
     assert ventana.registro.supervisor.currentText() == "Marta Soler Vidal"
@@ -198,7 +194,6 @@ def test_volver_al_login(acceso):
     assert ventana.paginas.currentWidget() is ventana.login
 
 
-# ── Sesión abierta ──
 @pytest.fixture
 def sesion_abierta(qapp):
     api = FalsaApi()
@@ -238,7 +233,7 @@ def test_al_caducar_se_vuelve_al_login_con_un_aviso(sesion_abierta):
     assert cierres == ["Tu sesión ha caducado. Vuelve a iniciar sesión."]
     assert api.token is None
     control.refrescar_caducidad(datetime.now(timezone.utc) + timedelta(minutes=17))
-    assert len(cierres) == 1                           # solo se cierra una vez
+    assert len(cierres) == 1
 
 
 def test_cerrar_sesion_avisa_al_servidor(sesion_abierta):
@@ -254,7 +249,6 @@ def test_cerrar_sesion_funciona_aunque_el_servidor_no_conteste(sesion_abierta):
     assert cierres == [""]
 
 
-# ── La aplicación entera ──
 def test_flujo_completo_login_ventana_y_cierre(qapp):
     api = FalsaApi()
     app = Aplicacion(api)
@@ -266,7 +260,7 @@ def test_flujo_completo_login_ventana_y_cierre(qapp):
     app.base.menu.boton_salir.click()
     assert app.base is None and app.acceso.isVisible()
     assert app.acceso.login.password.text() == ""
-    app.al_salir()                                     # sin sesión abierta no hace nada
+    app.al_salir()
     app.acceso.close()
 
 
