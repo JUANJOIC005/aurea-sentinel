@@ -235,7 +235,7 @@ Con el módulo de datos y la base de datos reales (y, tras el cambio a aplicaci�
 
 **Repositorio:** público, `JUANJOIC005/aurea-sentinel`. Ramas: `main` (versión entregada), `develop` (integración), `production` y una rama `tarea/Txx` por tarea. Cada tarea entró en `develop` con una pull request (#22 a #31) y todo el sprint pasó a `main` con la pull request #32; la etiqueta `v0.1.0` marca la entrega.
 
-**Quién fusiona:** Juan José Ibáñez es el encargado de fusionar en `main`.
+**Scrum Master y entrega:** Juan José Ibáñez es el Scrum Master, lleva el repositorio, es el encargado de fusionar en `main` y entrega el proyecto al profesor.
 
 **Issues #1 a #20:** una por tarea del backlog (T01 a T20), con su hito (Sprint 1 a 4, con fecha de fin), prioridad y responsable como etiquetas, y el texto de la tarea con su criterio de «hecho».
 
