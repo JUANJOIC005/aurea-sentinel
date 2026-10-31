@@ -1,4 +1,3 @@
-"""T05 y T10 · Registro con cuenta «pendiente»."""
 from servidor.api.auth import MENSAJE_REGISTRO
 from tests.conftest import CLAVE
 
@@ -76,7 +75,7 @@ def test_el_registro_queda_en_la_auditoria(api, conexion):
 
 
 def test_datos_publicos_del_formulario(api, crear_usuario):
-    crear_usuario()                                                  # supervisor activo de A1
+    crear_usuario()
     crear_usuario(nombre="Pendiente Pérez", correo="p@cn.es", estado="pendiente")
     crear_usuario(nombre="Javier Ruiz Pastor", correo="javier@cn.es", area="A2")
     areas = api.get("/publico/areas").json()
