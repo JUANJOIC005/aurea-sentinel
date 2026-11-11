@@ -8,7 +8,7 @@ os.environ["XDG_CONFIG_HOME"] = tempfile.mkdtemp(prefix="aurea-config-")
 import pytest
 from fastapi.testclient import TestClient
 
-from servidor import db, migrate, seguridad
+from servidor import config, db, migrate, seguridad
 from servidor.api.main import app
 
 CLAVE = "Valdecierzo-2026-ok!"
@@ -19,6 +19,12 @@ HASH_CLAVE = seguridad.hashear(CLAVE)
 def base_de_datos():
     migrate.desde_cero()
     migrate.preparar()
+
+
+@pytest.fixture(autouse=True)
+def sin_doble_factor(monkeypatch):
+    """Las pruebas de acceso y de datos entran solo con contraseña; las del segundo factor lo activan a propósito."""
+    monkeypatch.setattr(config, "DOBLE_FACTOR_ACTIVO", False)
 
 
 @pytest.fixture
@@ -54,6 +60,35 @@ def entrar(api):
         assert r.status_code == 200, r.text
         return r.json()["token"], r.json()
     return _entrar
+
+
+CORREOS = {
+    "laura": "laura.mendez@cn-valdecierzo.es", "javier": "javier.ruiz@cn-valdecierzo.es",
+    "diego": "diego.paredes@cn-valdecierzo.es", "nuria": "nuria.vega@cn-valdecierzo.es",
+    "ivan": "ivan.cano@cn-valdecierzo.es", "beatriz": "beatriz.lara@cn-valdecierzo.es",
+    "alvaro": "alvaro.campos@cn-valdecierzo.es",
+}
+
+
+@pytest.fixture
+def central(crear_usuario, conexion):
+    """Una central pequeña con sus lecturas: Laura (A1) y Javier (A2) con sus técnicos, un auditor y un administrador.
+    Diego tiene TE-101 y PT-102; Nuria, FT-103 y LT-104; Iván, PT-201 y LT-202. Devuelve los id por nombre."""
+    from tests import ayudas
+    ids = {"laura": crear_usuario("Laura Méndez Ortiz", CORREOS["laura"], "supervisor", "A1"),
+           "javier": crear_usuario("Javier Ruiz Pastor", CORREOS["javier"], "supervisor", "A2")}
+    ids["diego"] = crear_usuario("Diego Paredes Luna", CORREOS["diego"], "tecnico", None, ids["laura"])
+    ids["nuria"] = crear_usuario("Nuria Vega Santos", CORREOS["nuria"], "tecnico", None, ids["laura"])
+    ids["ivan"] = crear_usuario("Iván Cano Rubio", CORREOS["ivan"], "tecnico", None, ids["javier"])
+    ids["beatriz"] = crear_usuario("Beatriz Lara Quintana", CORREOS["beatriz"], "auditor", None)
+    ids["alvaro"] = crear_usuario("Álvaro Campos Ibarra", CORREOS["alvaro"], "administrador", None)
+    for tecnico, supervisor, etiquetas in (("diego", "laura", ("TE-101", "PT-102")),
+                                           ("nuria", "laura", ("FT-103", "LT-104")),
+                                           ("ivan", "javier", ("PT-201", "LT-202"))):
+        for etiqueta in etiquetas:
+            ayudas.asignar(conexion, ids[tecnico], etiqueta, ids[supervisor])
+    ayudas.sembrar_nominal(conexion)
+    return ids
 
 
 @pytest.fixture(scope="session")
