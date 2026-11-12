@@ -1,3 +1,4 @@
+import gc
 import os
 import tempfile
 
@@ -20,6 +21,14 @@ HASH_CLAVE = seguridad.hashear(CLAVE)
 def base_de_datos():
     migrate.desde_cero()
     migrate.preparar()
+
+
+@pytest.fixture(autouse=True)
+def recoger_basura():
+    """Destruye aquí, en el hilo principal, los objetos de Qt que queden sin dueño. Si los destruyera el recolector
+    en mitad de otra prueba, desde el hilo del servidor de pruebas, Qt aborta el proceso de forma intermitente."""
+    yield
+    gc.collect()
 
 
 @pytest.fixture(autouse=True)

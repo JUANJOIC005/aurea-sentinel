@@ -14,6 +14,11 @@ AVISO = "#B87500"
 ALARMA = "#C73636"
 NEUTRO = "#5E6E85"
 
+COLOR_ESTADO = {"normal": EN_RANGO, "aviso": AVISO, "alarma": ALARMA, "sin_datos": NEUTRO}
+FONDO_ESTADO = {"normal": "#E8F5EE", "aviso": "#FFF3D6", "alarma": "#FBECEC", "sin_datos": "#EEF1F6"}
+BANDA_AVISO = "#FBE9B8"     # bandas de las gráficas
+BANDA_ALARMA = "#F6D2D2"
+
 COLOR_ROL = {
     "supervisor": AZUL,
     "tecnico": ACERO,
