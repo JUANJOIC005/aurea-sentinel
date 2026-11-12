@@ -155,7 +155,7 @@ aurea-sentinel/
 |---|---|---|---|
 | **Cliente** | Alguien roba la contraseña mirando la pantalla o con un programa que registra teclas | Contraseña oculta, con botón para verla; no se guarda en disco | Hecho |
 | | Alguien usa un equipo que otra persona dejó abierto | Sesión con caducidad por rol y botón «Cerrar sesión»; al caducar vuelve al login | Hecho |
-| | Alguien manipula el cliente para ver otra área | El cliente solo esconde menús; **el módulo de datos decide** qué se devuelve | Parcial: permisos por área en el Sprint 2 (T11) |
+| | Alguien manipula el cliente para ver otra área | El cliente solo esconde menús; **el módulo de datos decide** qué se devuelve | Hecho (T11). Comprobado en T14 (apartado 7.2) |
 | **Módulo de datos** | Adivinar contraseñas probando muchas | Bloqueo de 15 min tras 5 fallos; contraseña mínima de 12 caracteres y lista de contraseñas filtradas | Hecho |
 | | Descubrir qué correos existen | Mismo mensaje y mismo tiempo de respuesta con cualquier fallo; el registro responde igual si el correo ya existe | Hecho |
 | | Robar un token de sesión | Token aleatorio de 256 bits, solo su hash en la base de datos, caducidad, se invalida al cerrar sesión o al bloquear la cuenta | Hecho |
@@ -165,7 +165,7 @@ aurea-sentinel/
 | **Base de datos** | Que alguien con acceso edite o borre el rastro de lo que hizo | El registro de auditoría no admite `UPDATE` ni `DELETE` (lo impide la propia base) | Hecho. La cadena de hashes llega en el Sprint 3 (T16) |
 | | Datos incoherentes (técnico sin supervisor, umbrales al revés, lecturas duplicadas) | Claves, restricciones y disparadores en las tablas | Hecho |
 | | Robo de contraseñas si se filtra la base | Solo hashes Argon2id | Hecho |
-| **Simulador** | Que alguien envíe lecturas falsas haciéndose pasar por él | Firma de cada lectura (HMAC) y rango físico válido | Pendiente (Sprint 2, T12). Hoy escribe directamente en la base de datos, en la misma máquina |
+| **Simulador** | Que alguien envíe lecturas falsas haciéndose pasar por él | Firma de cada lectura (HMAC) y rango físico válido | Hecho (T12). Comprobado en T14 (apartado 7.2), con un hallazgo pendiente |
 
 ### 6.2 Qué puede hacer cada rol (lo que implementa el Sprint 2)
 
@@ -195,7 +195,9 @@ Regla general para implementarlo: en cada petición el módulo de datos comprueb
 
 ---
 
-## 7. Pruebas (T10)
+## 7. Pruebas
+
+### 7.1 T10 · Login y registro (Sprint 1)
 
 **144 pruebas en verde, 92 % de cobertura**. Los modelos y controladores del cliente y del módulo de datos están entre el 85 % y el 100 %. Lo que queda sin probar son los arranques por línea de comandos (`migrate`, `simulador`, `datos_demo`, `config`), que se han ejecutado a mano.
 
@@ -212,6 +214,70 @@ Regla general para implementarlo: en cada petición el módulo de datos comprueb
 | `test_vistas.py` | Nombre y rol visibles en las 4 vistas, menú por rol, cambio de tamaño, tamaño mínimo 1024×640 |
 
 Las pruebas **nunca tocan los datos del usuario**: usan una base SQLite temporal (`AUREA_BD` apunta a una carpeta temporal) que se recrea desde cero antes de cada prueba. `test_local.py` comprueba el módulo interno, el puerto libre y la siembra de cuentas de la primera vez.
+
+### 7.2 T14 · Pruebas de permisos y de lecturas falsas (Sprint 2)
+
+Se ha atacado lo que construyen T11 (permisos por rol y área) y T12 (lecturas firmadas) desde fuera, como lo intentaría alguien sin permiso. Son **196 pruebas** en dos archivos: **194 pasan** y **2 fallan a propósito** porque documentan un hallazgo que aún no está corregido (marcadas como `xfail`, así que no rompen la batería).
+
+**Cómo se prueba.** `test_ataques_permisos.py` monta la central completa: un supervisor en cada una de las 9 áreas, dos técnicos con sensores asignados, un auditor y un administrador, con lecturas en los 36 sensores. Cada persona pide lo que la tabla de permisos (apartado 6.2) le prohíbe. `test_ataques_lecturas.py` envía lecturas a la ingesta, primero sin conocer la clave del simulador y después con la firma buena pero con datos falsos, como haría un simulador averiado o comprometido.
+
+**Resultados: ver datos de otra área (142 pruebas, todas en verde)**
+
+| Intento | Casos | Resultado esperado | Resultado |
+|---|---|---|---|
+| Un supervisor pide el histórico de los 4 sensores de cada una de las otras 8 áreas | 72 (288 peticiones) | 403 «prohibido», sin datos, anotado en el registro con el sensor | Correcto |
+| Un supervisor exporta el CSV de cada una de las otras áreas | 9 (72 peticiones) | 403 y ninguna exportación anotada salvo la de su área | Correcto |
+| Lecturas en directo y alarmas de cada supervisor | 18 | Solo los 4 sensores y las alarmas de su área | Correcto |
+| Un supervisor mira el equipo de otro | 1 | Solo ve a sus técnicos | Correcto |
+| Un técnico pide sensores no asignados de su área, de otras 8 áreas o del otro técnico | 11 | 403 | Correcto |
+| Lecturas en directo y alarmas del técnico | 1 | Solo sus sensores asignados | Correcto |
+| Al técnico le quitan un sensor con la sesión abierta | 1 | Pierde el acceso en la siguiente petición | Correcto |
+| Técnico, auditor y administrador entran en rutas que su rol no tiene | 11 | 403 | Correcto |
+| El auditor busca valores sueltos en directo o en el histórico | 4 | Solo recuentos por área y resúmenes por hora (mínimo, máximo, media) | Correcto |
+| Tag retocado: minúsculas, espacios, inyección SQL (`' OR '1'='1`, `--`, `;DROP TABLE`), comodines (`%`, `_`) o un guion Unicode parecido | 9 | 403, 404 o 422, nunca datos; la tabla de lecturas sigue intacta | Correcto |
+| El parámetro `tag` repetido con un sensor propio y uno ajeno | 1 | Nunca devuelve el sensor ajeno | Correcto |
+| Cambian a un supervisor de área sin cerrar su sesión | 1 | Deja de ver la antigua y ve la nueva en la siguiente petición | Correcto |
+| Usar el desafío del doble factor como si fuera una sesión | 1 | 401 en todas las rutas | Correcto |
+| Registro de auditoría de los intentos | 1 | Cada denegación guarda quién, qué recurso y qué sensor | Correcto |
+| Comprobación del catálogo que usa la prueba | 1 | Los 36 sensores y sus áreas coinciden con la base | Correcto |
+
+**Resultados: firmas incorrectas (27 pruebas, todas en verde)**
+
+| Intento | Casos | Resultado esperado | Resultado |
+|---|---|---|---|
+| Firmar con una clave adivinada (vacía, «aurea», la contraseña de demo, ceros) | 4 | 401 «Firma no válida», nada guardado, anotado | Correcto |
+| Firmar con MD5, SHA-1 o SHA-512 en vez de SHA-256 | 3 | 401 | Correcto |
+| Firma truncada, en mayúsculas, con un carácter cambiado, duplicada o vacía | 5 | 401 | Correcto |
+| Firmar solo el cuerpo, sin la marca de tiempo | 1 | 401 | Correcto |
+| Cambiar la marca de tiempo después de firmar | 1 | 401 | Correcto |
+| Marca de tiempo vacía, con letras, con decimales, negativa, en notación científica o enorme | 6 | 401 | Correcto |
+| Envío bien firmado pero con la hora del futuro (más de 5 min) | 1 | 401 | Correcto |
+| Copiar la firma de un envío bueno y cambiar el valor, el sensor, la hora o añadir una lectura | 4 | 401 | Correcto |
+| Mandar lecturas con una sesión de usuario en vez de con firma | 1 | 401: la sesión no sustituye a la firma | Correcto |
+| Repetir un envío bueno dentro de los 5 minutos de margen | 1 | No guarda nada nuevo (cuenta como duplicada) | Correcto |
+
+**Resultados: lecturas manipuladas con firma válida (27 pruebas: 25 en verde y 2 con hallazgo)**
+
+| Intento | Casos | Resultado esperado | Resultado |
+|---|---|---|---|
+| Valores justo por fuera del rango físico de los 36 sensores, por abajo y por arriba | 1 (72 lecturas) | Las 72 rechazadas como `fuera_de_rango_fisico` | Correcto |
+| Valores exactamente en los límites físicos | 1 (72 lecturas) | Se aceptan | Correcto |
+| `NaN`, `Infinity`, `-Infinity`, `1e309`, `null`, lista, objeto, texto vacío | 8 | 422, nada guardado | Correcto |
+| `true` o el número escrito como texto (`"325.6"`) | 2 | 422, nada guardado | **Hallazgo**: se aceptan y se guardan (`true` como 1.0) |
+| Tag parecido al de un sensor real (minúsculas, espacios, guion Unicode, letra O por cero, inyección SQL) | 6 | Rechazado como `sensor_desconocido` | Correcto |
+| Fechas falsas: 1970, año 9999, «ahora», 30 de febrero, hora 25 | 5 | Rechazadas con su motivo | Correcto |
+| Hora con otra zona horaria que en realidad cae en el futuro | 1 | Rechazada como `fecha_en_el_futuro` | Correcto |
+| Reescribir una lectura ya guardada (mismo sensor y hora, otro valor) | 1 | Se queda el valor original | Correcto |
+| Campos de más en la lectura (`valida`, `sensor_id`, `area`, `firma`) | 1 | Se ignoran | Correcto |
+| Registro de las lecturas rechazadas | 1 | Un evento con cuántas y por qué motivo | Correcto |
+
+**Hallazgo pendiente (para T12).** Con una firma válida, la ingesta acepta `"valor": true` y `"valor": "325.6"`, porque Pydantic los convierte a número. Para hacerlo hace falta la clave del simulador, así que el riesgo es bajo, pero el valor guardado no es una medida real. Se corrige declarando el campo como número estricto en `servidor/api/ingesta.py` (por ejemplo `valor: float = Field(strict=True)`, o `StrictFloat` si se quieren rechazar también los enteros). Cuando se corrija, las dos pruebas marcadas pasarán a verde y habrá que quitar la marca `xfail`.
+
+**Observaciones.**
+- Un envío bueno repetido dentro de los 5 minutos de margen se responde con 200, pero no guarda nada nuevo. No hace daño, aunque el registro no lo anota como repetición.
+- Un sensor que no existe da 404 y uno de otra área da 403. Esto deja saber qué códigos de sensor existen, pero el catálogo no es secreto (lo enseña el inventario), así que se deja así a propósito.
+
+Para repetirlo: `python -m pytest tests/test_ataques_permisos.py tests/test_ataques_lecturas.py`.
 
 ---
 
