@@ -237,11 +237,11 @@ Con el módulo de datos y la base de datos reales (y, tras el cambio a aplicaci�
 
 **Rama `production`:** contiene el código y el ejecutable ya compilado, `AUREA Sentinel.exe`, para abrirlo sin compilar. La rama `main` es la de pruebas y compilación: al subir a `main`, GitHub Actions pasa las pruebas y construye el `.exe`.
 
-**Scrum Master y entrega:** Juan José Ibáñez es el Scrum Master, lleva el repositorio, es el encargado de fusionar en `main` y entrega el proyecto al profesor.
+**Scrum Master y entrega:** en el Sprint 1 el Scrum Master fue Juan José Ibáñez. **A partir del Sprint 2 el Scrum Master es Gonzalo Revuelta**, que lleva el repositorio, es el encargado de fusionar en `main` y entrega el proyecto al profesor.
 
 **Issues #1 a #20:** una por tarea del backlog (T01 a T20), con su hito (Sprint 1 a 4, con fecha de fin), prioridad y responsable como etiquetas, y el texto de la tarea con su criterio de «hecho».
 
-**Protección de `main`:** GitHub no la permite en repositorios privados con cuenta gratuita; el repositorio es público y la norma es que solo Juan José Ibáñez fusiona en `main`.
+**Protección de `main`:** GitHub no la permite en repositorios privados con cuenta gratuita; el repositorio es público y la norma es que solo el Scrum Master fusiona en `main` (Juan José Ibáñez en el Sprint 1, Gonzalo Revuelta desde el Sprint 2).
 
 **Captura del Kanban:** `python3 scripts/kanban_captura.py <salida.png> "Captura de final de sprint"` dibuja el tablero real de GitHub Projects (código, título, responsable, horas y prioridad de cada tarea, totales por columna y fecha y hora de la captura). Siempre sale con la fecha real.
 
