@@ -4,6 +4,7 @@ import tempfile
 os.environ["AUREA_BD"] = os.path.join(tempfile.mkdtemp(prefix="aurea-bd-"), "pruebas.db")
 os.environ["QT_QPA_PLATFORM"] = "offscreen"
 os.environ["XDG_CONFIG_HOME"] = tempfile.mkdtemp(prefix="aurea-config-")
+os.environ["AUREA_SIN_HISTORICO"] = "1"   # las pruebas parten de una base sin lecturas; las de T12 cargan las suyas
 
 import pytest
 from fastapi.testclient import TestClient
