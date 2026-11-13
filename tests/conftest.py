@@ -108,4 +108,13 @@ def qapp():
     from cliente.vista import estilos
     aplicacion = QApplication.instance() or QApplication([])
     aplicacion.setStyleSheet(estilos.HOJA)
-    return aplicacion
+    yield aplicacion
+    # Al acabar la sesión se destruyen las ventanas que queden mientras Qt aún está entero: si lo hace el intérprete al
+    # salir, con Qt ya apagado, el proceso se cae (violación de acceso en Windows, fallo de segmentación en Linux)
+    # después de haber pasado todas las pruebas.
+    for ventana in aplicacion.topLevelWidgets():
+        ventana.close()
+        ventana.deleteLater()
+    aplicacion.processEvents()
+    gc.collect()
+    aplicacion.processEvents()
