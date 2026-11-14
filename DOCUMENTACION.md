@@ -21,7 +21,7 @@ Qué se ha hecho, cómo se ha instalado, cómo se usa y qué falta. Está escrit
 
 **Lo que ya se ve en la aplicación:** acceso con segundo paso, panel en directo y histórico del **Supervisor**. El Técnico, el Auditor y el Administrador entran, pero sus ventanas propias llegan en los Sprints 3 y 4; mientras tanto el servidor ya les limita lo que pueden pedir.
 
-**Pendiente del equipo:** firmar las actas, las horas reales del backlog y la autoevaluación por pares. No se pueden inventar: son del equipo.
+**Cierre del sprint (13/11/2026):** `develop` pasó a `main` (pull request #59) y en `main` pasan las pruebas y se construye el `.exe`. Actas nº 04 a 07 firmadas, horas reales en el Product Backlog y capturas del tablero al inicio y al final. Queda la autoevaluación por pares, que sube cada persona.
 
 ---
 
@@ -225,7 +225,7 @@ Regla general: en cada petición el módulo de datos comprueba **rol**, luego **
 
 ## 7. Pruebas
 
-**486 pruebas en verde**, repetidas varias veces seguidas sin fallos intermitentes. La cobertura se medirá al cierre del proyecto (T20).
+**486 pruebas en verde**, repetidas varias veces seguidas sin fallos intermitentes. **Cobertura del 95 %** en `servidor`, `simulador`, `cliente/modelo` y `cliente/controlador` (medida el 13/11/2026 sobre `main`, con las pruebas repartidas en procesos como en GitHub Actions); el requisito RNF-08 pide al menos el 70 %.
 
 | Archivo | Pruebas | Qué comprueba |
 |---|---|---|
@@ -271,14 +271,16 @@ Con el módulo de datos real, una base de datos nueva y el simulador firmado com
 
 ## 9. Qué falta
 
-**Ya hecho (12/11):** T11 a T14 fusionadas en `develop` y 486 pruebas en verde; columnas del tablero cambiadas a Sprint Backlog, To Do, Doing y Done.
+**Hecho en el Sprint 2:**
+1. T11 a T14 fusionadas en `develop` el 12/11 (pull request #52 a #55) y 486 pruebas en verde.
+2. Arreglo de las pruebas de ventanas en Windows (#58), documentación del Sprint 2 (#57) y `develop` en `main` (#59) el 13/11; en `main` pasan las pruebas y se construye el `.exe`.
+3. Tablero con las columnas Sprint Backlog, To Do, Doing y Done, T01 a T14 en Done y capturas de inicio y de final del sprint.
+4. Actas nº 04 (planificación, 02/11), 05 (seguimiento, 11/11), 06 (integración, 12/11) y 07 (revisión y retrospectiva, 13/11), firmadas por los cuatro.
+5. Product Backlog con el Sprint Backlog del Sprint 2 y las horas reales, y lista de requisitos con su estado: 10 cumplidos, 7 parciales y 3 pendientes (planificados para los Sprints 3 y 4).
 
-**Para cerrar el Sprint 2:**
-1. Actas del Sprint 2 (planificación, seguimiento, revisión y retrospectiva), con fecha, lugar, asistentes, orden del día y acuerdos reales. Las redacta el equipo con lo que ocurrió.
-2. Autoevaluación por pares (cada persona rellena la suya).
-3. Horas reales de cada tarea en el backlog.
-4. Capturas del tablero Kanban al inicio y al final del sprint, con las mismas tareas que el Product Backlog. La de inicio se reconstruyó del historial del tablero.
-5. Fusionar `develop` en `main` **antes de entregar** (solo el Scrum Master, Gonzalo Revuelta, con revisión de otra persona): el enunciado pide la rama principal actualizada y funcionando. Reconstruir el `.exe`.
+**Pendiente para cerrar el Sprint 2:** la autoevaluación por pares (cada persona sube la suya).
+
+**Observación para el Sprint 3:** con una firma válida, la ingesta acepta un valor `true` o un número escrito como texto (lo encontró T14); se corrige declarando el campo como número estricto.
 
 **Sprint 3 (16/11 al 29/11):** tareas, incidencias y alarmas (T15), registro de auditoría encadenado y exportación (T16), ventanas de equipo, Mi turno e incidencia (T17), pruebas de integración y manual (T18).
 
@@ -300,8 +302,8 @@ Con el módulo de datos real, una base de datos nueva y el simulador firmado com
 
 **Tablero Kanban:** https://github.com/users/JUANJOIC005/projects/1, con las 20 issues. Desde el 12/11/2026 sus columnas son las que pide la rúbrica: *Sprint Backlog · To Do · Doing · Done* (antes eran Por hacer · En curso · En revisión · Hecho). La captura de inicio del Sprint 2 se reconstruyó ese día con el historial de cambios de estado del tablero, porque no se hizo el 02/11, y la propia imagen lo indica. Las capturas se generan con `python3 scripts/kanban_captura.py <salida.png> "texto"`: dibuja el tablero real (código, título, responsable, horas y prioridad de cada tarea, totales por columna y fecha y hora de la captura). Siempre sale con la fecha real y no se retoca.
 
-**Actas:** `scripts/actas_pdf.py <carpeta>` genera las actas con la plantilla de actas de AUREA AUDIT. Las horas, el lugar, la retrospectiva y las firmas se dejan en blanco: solo el equipo las sabe.
+**Actas:** se hacen con la plantilla de actas de AUREA AUDIT (`scripts/actas_pdf.py` genera las del Sprint 1). Las del Sprint 2 son la nº 04 a la 07, redactadas por el Scrum Master con la fecha, la hora, el lugar, los asistentes y los acuerdos de cada reunión, y firmadas por los cuatro.
 
-**Product Backlog y lista de requisitos:** el Product Backlog (Excel, con la plantilla del profesor) y la lista de requisitos (PDF) se actualizan al cierre de cada sprint y se entregan junto con el resto. Los del Sprint 2 están en la carpeta de cierre del sprint.
+**Product Backlog y lista de requisitos:** el Product Backlog (Excel, con la plantilla del profesor) y la lista de requisitos (PDF) se actualizan al cierre de cada sprint y se entregan junto con el resto. Los del Sprint 2 se entregan con el resto: el Excel lleva la hoja del Sprint Backlog del Sprint 2, las horas reales y la hoja de requisitos, y la lista de requisitos va también en PDF.
 
 **Entregables del Sprint 2 en Canvas** («SPRINT 2 - DESARROLLO», hasta el 15 de noviembre a las 23:59): todas las actas de reunión del sprint en PDF; dos capturas del tablero Kanban (estado de todas las tareas al inicio y al final del sprint); enlace a GitHub con la rama principal actualizada y funcionando; copia del proyecto en `.zip` de la última versión funcional; y esta documentación actualizada al final del sprint. Además, cada miembro sube su Excel a la tarea de evaluación entre pares (si falta uno, el equipo entero tiene un 0 en esa parte). La rúbrica puntúa también que el Product Backlog y la lista de requisitos estén actualizados y concuerden con el proyecto, por eso se entregan con el resto.
