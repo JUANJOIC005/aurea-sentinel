@@ -14,9 +14,11 @@ jobs:
         with:
           python-version: "3.14"
       - run: pip install -r requirements.txt pillow
-      # Las pruebas con ventanas (Qt) van en un proceso aparte: juntas con las del servidor abortan en Windows.
-      - run: python -m pytest -q --ignore=tests/test_cliente_controlador.py --ignore=tests/test_vistas.py
+      # Las pruebas con ventanas (Qt) van en procesos aparte: juntas con las del servidor, o varias de ventanas a la vez, abortan en Windows.
+      - run: python -m pytest -q --ignore=tests/test_cliente_controlador.py --ignore=tests/test_vistas.py --ignore=tests/test_vistas_sprint2.py --ignore=tests/test_acceso_2fa.py --ignore=tests/test_controlador_supervisor.py
       - run: python -m pytest -q tests/test_cliente_controlador.py tests/test_vistas.py
+      - run: python -m pytest -q tests/test_vistas_sprint2.py
+      - run: python -m pytest -q tests/test_acceso_2fa.py tests/test_controlador_supervisor.py
       - run: pyinstaller aurea_sentinel.spec
       - uses: actions/upload-artifact@v4
         with:

@@ -67,7 +67,26 @@ def crear_cuentas(conn, password: str) -> int:
         ).fetchone()
         ids[nombre] = fila["id"]
         creadas += 1
+    asignar_sensores(conn)
     return creadas
+
+
+def asignar_sensores(conn) -> int:
+    """Reparte los sensores de cada área entre los técnicos de su supervisor (el técnico ve «sus sensores»).
+    Con un solo técnico se queda con los cuatro; con dos, dos cada uno. Se puede repetir sin duplicar nada."""
+    nuevas = 0
+    for sup in conn.execute("SELECT u.id, u.area_id FROM usuario u JOIN rol r ON r.id = u.rol_id"
+                            " WHERE r.codigo = 'supervisor'").fetchall():
+        tecnicos = conn.execute("SELECT id FROM usuario WHERE supervisor_id = ? ORDER BY id", (sup["id"],)).fetchall()
+        sensores = conn.execute("SELECT id FROM sensor WHERE area_id = ? ORDER BY id", (sup["area_id"],)).fetchall()
+        for i, sensor in enumerate(sensores):
+            if not tecnicos:
+                break
+            tecnico = tecnicos[i % len(tecnicos)]
+            nuevas += conn.execute(
+                "INSERT OR IGNORE INTO asignacion_sensor (tecnico_id, sensor_id, asignado_por) VALUES (?, ?, ?)",
+                (tecnico["id"], sensor["id"], sup["id"])).rowcount
+    return nuevas
 
 
 def main() -> None:

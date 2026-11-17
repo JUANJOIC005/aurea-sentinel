@@ -13,6 +13,7 @@ from ..vista.ventana_acceso import VentanaAcceso
 from ..vista.ventana_base import VentanaBase
 from .acceso import ControladorAcceso
 from .sesion import ControladorSesion
+from .supervisor import ControladorSupervisor
 
 
 class Aplicacion:
@@ -23,6 +24,7 @@ class Aplicacion:
         self.control_acceso.sesion_iniciada.connect(self.abrir_sesion)
         self.base: VentanaBase | None = None
         self.control_sesion: ControladorSesion | None = None
+        self.control_supervisor: ControladorSupervisor | None = None
         self._tic = QTimer()
         self._tic.timeout.connect(self._comprobar_servidor_en_acceso)
 
@@ -40,6 +42,8 @@ class Aplicacion:
         self.base = VentanaBase(sesion, self.api.servidor)
         self.control_sesion = ControladorSesion(self.api, sesion, self.base)
         self.control_sesion.sesion_cerrada.connect(self.cerrar_sesion)
+        if sesion.usuario.rol == "supervisor":      # las demás ventanas por rol llegan en los Sprints 3 y 4
+            self.control_supervisor = ControladorSupervisor(self.api, sesion, self.base)
         self.acceso.hide()
         self.base.show()
 
@@ -50,6 +54,9 @@ class Aplicacion:
         if motivo:
             self.acceso.login.mostrar_error(motivo)
         self.acceso.show()
+        if self.control_supervisor is not None:
+            self.control_supervisor.detener()
+            self.control_supervisor = None
         if self.base is not None:
             self.base.close()
             self.base.deleteLater()
