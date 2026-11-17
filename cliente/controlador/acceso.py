@@ -10,6 +10,7 @@ from ..vista.ventana_acceso import VentanaAcceso
 
 CORREO = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 SIN_CONEXION = "No se puede conectar con el servidor ({servidor}). Comprueba que está en marcha."
+CODIGO_ERRONEO = "Código incorrecto"       # así empieza el mensaje del servidor cuando aún quedan intentos
 REGISTRO_ENVIADO = ("Solicitud enviada. Tu cuenta está pendiente de aprobación: "
                     "no podrás iniciar sesión hasta que un administrador la apruebe.")
 
@@ -26,6 +27,9 @@ class ControladorAcceso(QObject):
         ventana.registro.enviar.connect(self.enviar_registro)
         ventana.registro.volver.connect(self.volver_al_login)
         ventana.registro.area_cambiada.connect(self.cargar_supervisores)
+        ventana.verificacion.verificar.connect(self.verificar_codigo)
+        ventana.verificacion.cambiar_usuario.connect(self.volver_al_paso_1)
+        self._paso2: dict | None = None        # desafío del servidor mientras se espera el código
 
     # ── Login ──
     def iniciar_sesion(self, correo: str, password: str, equipo_compartido: bool) -> None:
@@ -39,7 +43,7 @@ class ControladorAcceso(QObject):
         login.ocultar_aviso()
         login.ocupado(True)
         try:
-            sesion = Sesion.desde_respuesta(self.api.login(correo, password))
+            datos = self.api.login(correo, password)
         except ErrorApi as error:
             login.mostrar_error(error.mensaje)
             return
@@ -50,13 +54,74 @@ class ControladorAcceso(QObject):
         finally:
             login.ocupado(False)
 
+        if datos.get("requiere_2fa"):
+            self._empezar_verificacion(datos, correo, equipo_compartido)
+        else:
+            self._abrir_sesion(datos, correo, equipo_compartido)
+
+    def _abrir_sesion(self, datos: dict, correo: str, equipo_compartido: bool) -> None:
+        sesion = Sesion.desde_respuesta(datos)
         self.api.usar_token(sesion.token)
         ajustes = QSettings("AUREA AUDIT", "AUREA Sentinel")
         if equipo_compartido:
             ajustes.remove("ultimo_correo")
         else:
             ajustes.setValue("ultimo_correo", correo)
+        self._paso2 = None
         self.sesion_iniciada.emit(sesion)
+
+    # ── Segundo paso: código de 6 dígitos ──
+    def _empezar_verificacion(self, datos: dict, correo: str, equipo_compartido: bool) -> None:
+        self._paso2 = {"desafio": datos["desafio"], "configurado": datos["configurado"], "correo": correo,
+                       "compartido": equipo_compartido}
+        self.ventana.mostrar_verificacion(datos["usuario"])
+        if datos["configurado"]:
+            return
+        try:                                  # primera vez: el servidor da el QR para la aplicación autenticadora
+            qr = self.api.configurar_2fa(datos["desafio"])
+        except ErrorApi as error:
+            self._volver_al_login(error.mensaje)
+        except ErrorConexion:
+            self._volver_al_login(SIN_CONEXION.format(servidor=self.api.servidor))
+        else:
+            self.ventana.verificacion.modo_configuracion(qr["secreto"], qr["qr_svg"])
+
+    def verificar_codigo(self, codigo: str) -> None:
+        if self._paso2 is None:
+            return
+        paso = self._paso2
+        vista = self.ventana.verificacion
+        vista.ocultar_aviso()
+        vista.ocupado(True)
+        enviar = self.api.verificar_2fa if paso["configurado"] else self.api.activar_2fa
+        try:
+            datos = enviar(paso["desafio"], codigo)
+        except ErrorApi as error:
+            if error.estado == 401 and error.mensaje.startswith(CODIGO_ERRONEO):
+                vista.ocupado(False)           # se queda en el paso 2 para escribir otro código
+                vista.mostrar_error(error.mensaje)
+                vista.casillas.limpiar()
+            else:                              # desafío caducado, 3 códigos erróneos o cuenta bloqueada
+                vista.ocupado(False)
+                self._volver_al_login(error.mensaje)
+            return
+        except ErrorConexion:
+            vista.ocupado(False)
+            vista.mostrar_error(SIN_CONEXION.format(servidor=self.api.servidor))
+            return
+        vista.ocupado(False)
+        self._abrir_sesion(datos, paso["correo"], paso["compartido"])
+
+    def volver_al_paso_1(self) -> None:
+        """«¿No eres tú? Cambiar»: se descarta el desafío y se vuelve a pedir correo y contraseña."""
+        self._volver_al_login("")
+
+    def _volver_al_login(self, mensaje: str) -> None:
+        self._paso2 = None
+        self.ventana.mostrar_login()
+        self.ventana.login.limpiar()
+        if mensaje:
+            self.ventana.login.mostrar_error(mensaje)
 
     # ── Registro ──
     def abrir_registro(self) -> None:
