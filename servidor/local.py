@@ -44,7 +44,8 @@ class ServidorLocal:
 
 
 def preparar_base_de_datos() -> bool:
-    """Crea o actualiza la base de datos y, si está vacía, las cuentas de demostración y 30 días de lecturas
+    """Crea o actualiza la base de datos y, si está vacía, las cuentas de demostración (con tareas de ejemplo)
+    y 30 días de lecturas
     (la variable AUREA_SIN_HISTORICO desactiva la carga de lecturas, para las pruebas).
     Devuelve True si ha creado las cuentas de demostración."""
     migrate.preparar()
@@ -52,6 +53,7 @@ def preparar_base_de_datos() -> bool:
     with db.conexion() as conn:
         if not conn.execute("SELECT 1 FROM usuario LIMIT 1").fetchone():
             datos_demo.crear_cuentas(conn, datos_demo.password_demo())
+            datos_demo.sembrar_trabajo(conn)
             creadas = True
         if not os.environ.get("AUREA_SIN_HISTORICO") and not historico.hay_lecturas(conn):
             historico.cargar(conn)

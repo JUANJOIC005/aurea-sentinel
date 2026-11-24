@@ -89,6 +89,43 @@ def asignar_sensores(conn) -> int:
     return nuevas
 
 
+# Tareas de ejemplo para que el Supervisor y sus técnicos no empiecen con las ventanas vacías (T15).
+# (título, prioridad, estado, días hasta la fecha límite; el sensor es el n-ésimo asignado al técnico)
+TAREAS_DEMO = [
+    ("Calibración mensual de {tag}", "media", "pendiente", 3, 0),
+    ("Revisar la deriva de {tag} frente al sensor redundante", "alta", "en_curso", 1, 1),
+    ("Ronda de verificación de {tag}", "baja", "hecha", 0, 0),
+]
+
+
+def sembrar_trabajo(conn) -> int:
+    """Crea tareas de ejemplo para cada técnico (y una inspección en la que ya está hecha). Solo si no hay ninguna."""
+    if conn.execute("SELECT 1 FROM tarea LIMIT 1").fetchone():
+        return 0
+    creadas = 0
+    tecnicos = conn.execute("SELECT u.id, u.supervisor_id FROM usuario u JOIN rol r ON r.id = u.rol_id"
+                            " WHERE r.codigo = 'tecnico' AND u.estado = 'activo' ORDER BY u.id").fetchall()
+    for t in tecnicos:
+        sensores = conn.execute("SELECT s.id, s.tag FROM asignacion_sensor x JOIN sensor s ON s.id = x.sensor_id"
+                                " WHERE x.tecnico_id = ? ORDER BY s.id", (t["id"],)).fetchall()
+        if not sensores:
+            continue
+        for titulo, prioridad, estado, dias, n in TAREAS_DEMO:
+            sensor = sensores[n % len(sensores)]
+            fila = conn.execute(
+                "INSERT INTO tarea (titulo, creada_por, asignada_a, sensor_id, prioridad, estado, fecha_limite,"
+                " cerrada_en) VALUES (?, ?, ?, ?, ?, ?, date('now', ?), CASE WHEN ? = 'hecha' THEN datetime('now')"
+                " END) RETURNING id",
+                (titulo.format(tag=sensor["tag"]), t["supervisor_id"], t["id"], sensor["id"], prioridad, estado,
+                 f"+{dias} days", estado)).fetchone()
+            if estado == "hecha":
+                conn.execute("INSERT INTO incidencia (tecnico_id, tarea_id, sensor_id, tipo, observaciones)"
+                             " VALUES (?, ?, ?, 'inspeccion', 'Sin anomalías visibles.')",
+                             (t["id"], fila["id"], sensor["id"]))
+            creadas += 1
+    return creadas
+
+
 def main() -> None:
     migrate.preparar()
     with db.conexion() as conn:
