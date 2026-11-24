@@ -1,7 +1,7 @@
 """Login, registro y sesión."""
 from fastapi import APIRouter, Depends, Header, Request
 
-from .. import auditoria, config, db, seguridad, sesiones, usuarios
+from .. import auditoria, config, db, doble_factor, seguridad, sesiones, usuarios
 from .errores import ErrorNegocio
 from .esquemas import PeticionLogin, PeticionRegistro
 
@@ -63,6 +63,16 @@ def login(datos: PeticionLogin, request: Request):
             _fallo_login(conn, f"cuenta_{usuario['estado']}", usuario["id"], ip, "denegado")
             conn.commit()
             raise ErrorNegocio(401, MENSAJE_LOGIN)
+
+        if config.DOBLE_FACTOR_ACTIVO and usuario["rol"] in config.DOBLE_FACTOR_ROLES:
+            # Contraseña correcta, pero aún no hay sesión: falta el código de 6 dígitos. Los fallos acumulados
+            # no se borran hasta que el código también sea correcto.
+            desafio = doble_factor.crear_desafio(conn, usuario["id"])
+            segundo = doble_factor.estado(conn, usuario["id"])
+            auditoria.registrar(conn, "login_primer_paso", "ok", actor_id=usuario["id"], recurso="sesion",
+                                detalle={"ip": ip})
+            return {"requiere_2fa": True, "configurado": bool(segundo and segundo["activo"]),
+                    "desafio": desafio, "usuario": usuarios.perfil(conn, usuario["id"])}
 
         usuarios.anotar_acceso(conn, usuario["id"])
         token, expira_en = sesiones.crear(conn, usuario["id"], usuario["rol"])

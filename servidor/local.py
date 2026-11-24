@@ -1,15 +1,18 @@
 """Servidor local: la aplicación lo arranca dentro de su propio proceso, sin instalar nada aparte.
 
 Prepara la base de datos (la crea si no existe) y levanta la API en 127.0.0.1 con un puerto libre.
-La primera vez, si no hay ninguna cuenta, crea las de demostración de la central ficticia.
+La primera vez, si no hay ninguna cuenta, crea las de demostración de la central ficticia y, si no hay lecturas,
+carga 30 días de histórico de los 36 sensores (unos 3 segundos). Mientras está abierta anota su dirección en
+`servidor.json` para que el simulador, que es otro proceso, sepa dónde enviar las lecturas.
 """
+import os
 import socket
 import threading
 import time
 
 import uvicorn
 
-from . import datos_demo, db, migrate
+from . import datos_demo, db, descubrimiento, historico, migrate
 from .api.main import app
 
 
@@ -31,22 +34,28 @@ class ServidorLocal:
             if not self._hilo.is_alive() or time.monotonic() > limite:
                 raise RuntimeError("El servidor local no ha podido arrancar.")
             time.sleep(0.02)
+        descubrimiento.publicar(self.url)
 
     def parar(self) -> None:
+        descubrimiento.retirar()
         self._servidor.should_exit = True
         self._hilo.join(timeout=5)
         self._socket.close()
 
 
 def preparar_base_de_datos() -> bool:
-    """Crea o actualiza la base de datos y, si está vacía, las cuentas de demostración.
+    """Crea o actualiza la base de datos y, si está vacía, las cuentas de demostración y 30 días de lecturas
+    (la variable AUREA_SIN_HISTORICO desactiva la carga de lecturas, para las pruebas).
     Devuelve True si ha creado las cuentas de demostración."""
     migrate.preparar()
+    creadas = False
     with db.conexion() as conn:
-        if conn.execute("SELECT 1 FROM usuario LIMIT 1").fetchone():
-            return False
-        datos_demo.crear_cuentas(conn, datos_demo.password_demo())
-    return True
+        if not conn.execute("SELECT 1 FROM usuario LIMIT 1").fetchone():
+            datos_demo.crear_cuentas(conn, datos_demo.password_demo())
+            creadas = True
+        if not os.environ.get("AUREA_SIN_HISTORICO") and not historico.hay_lecturas(conn):
+            historico.cargar(conn)
+    return creadas
 
 
 def iniciar() -> ServidorLocal:

@@ -42,3 +42,13 @@ PASSWORD_MINIMO = 12          # longitud mínima de contraseña
 
 # Caducidad de la sesión según el rol (minutos)
 SESION_MINUTOS = {"supervisor": 15, "tecnico": 30, "auditor": 15, "administrador": 10}
+
+# Segundo factor (código de 6 dígitos). Obligatorio para estos roles; AUREA_DOBLE_FACTOR=no lo desactiva
+# (solo para desarrollar o para una demostración sin móvil: por defecto está activado).
+DOBLE_FACTOR_ACTIVO = os.environ.get("AUREA_DOBLE_FACTOR", "si").strip().lower() not in ("no", "0", "false", "off")
+DOBLE_FACTOR_ROLES = frozenset({"supervisor", "auditor", "administrador"})
+DESAFIO_MINUTOS = 5           # tiempo para escribir el código tras acertar la contraseña
+CODIGOS_POR_DESAFIO = 3       # tres códigos erróneos devuelven al paso 1
+
+# Cuántos días de histórico puede consultar cada rol de una vez
+HISTORICO_DIAS = {"supervisor": 30, "tecnico": 7, "auditor": 30}

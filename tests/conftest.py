@@ -1,14 +1,16 @@
+import gc
 import os
 import tempfile
 
 os.environ["AUREA_BD"] = os.path.join(tempfile.mkdtemp(prefix="aurea-bd-"), "pruebas.db")
 os.environ["QT_QPA_PLATFORM"] = "offscreen"
 os.environ["XDG_CONFIG_HOME"] = tempfile.mkdtemp(prefix="aurea-config-")
+os.environ["AUREA_SIN_HISTORICO"] = "1"   # las pruebas parten de una base sin lecturas; las de T12 cargan las suyas
 
 import pytest
 from fastapi.testclient import TestClient
 
-from servidor import db, migrate, seguridad
+from servidor import config, db, migrate, seguridad
 from servidor.api.main import app
 
 CLAVE = "Valdecierzo-2026-ok!"
@@ -19,6 +21,20 @@ HASH_CLAVE = seguridad.hashear(CLAVE)
 def base_de_datos():
     migrate.desde_cero()
     migrate.preparar()
+
+
+@pytest.fixture(autouse=True)
+def recoger_basura():
+    """Destruye aquí, en el hilo principal, los objetos de Qt que queden sin dueño. Si los destruyera el recolector
+    en mitad de otra prueba, desde el hilo del servidor de pruebas, Qt aborta el proceso de forma intermitente."""
+    yield
+    gc.collect()
+
+
+@pytest.fixture(autouse=True)
+def sin_doble_factor(monkeypatch):
+    """Las pruebas de acceso y de datos entran solo con contraseña; las del segundo factor lo activan a propósito."""
+    monkeypatch.setattr(config, "DOBLE_FACTOR_ACTIVO", False)
 
 
 @pytest.fixture
@@ -56,6 +72,35 @@ def entrar(api):
     return _entrar
 
 
+CORREOS = {
+    "laura": "laura.mendez@cn-valdecierzo.es", "javier": "javier.ruiz@cn-valdecierzo.es",
+    "diego": "diego.paredes@cn-valdecierzo.es", "nuria": "nuria.vega@cn-valdecierzo.es",
+    "ivan": "ivan.cano@cn-valdecierzo.es", "beatriz": "beatriz.lara@cn-valdecierzo.es",
+    "alvaro": "alvaro.campos@cn-valdecierzo.es",
+}
+
+
+@pytest.fixture
+def central(crear_usuario, conexion):
+    """Una central pequeña con sus lecturas: Laura (A1) y Javier (A2) con sus técnicos, un auditor y un administrador.
+    Diego tiene TE-101 y PT-102; Nuria, FT-103 y LT-104; Iván, PT-201 y LT-202. Devuelve los id por nombre."""
+    from tests import ayudas
+    ids = {"laura": crear_usuario("Laura Méndez Ortiz", CORREOS["laura"], "supervisor", "A1"),
+           "javier": crear_usuario("Javier Ruiz Pastor", CORREOS["javier"], "supervisor", "A2")}
+    ids["diego"] = crear_usuario("Diego Paredes Luna", CORREOS["diego"], "tecnico", None, ids["laura"])
+    ids["nuria"] = crear_usuario("Nuria Vega Santos", CORREOS["nuria"], "tecnico", None, ids["laura"])
+    ids["ivan"] = crear_usuario("Iván Cano Rubio", CORREOS["ivan"], "tecnico", None, ids["javier"])
+    ids["beatriz"] = crear_usuario("Beatriz Lara Quintana", CORREOS["beatriz"], "auditor", None)
+    ids["alvaro"] = crear_usuario("Álvaro Campos Ibarra", CORREOS["alvaro"], "administrador", None)
+    for tecnico, supervisor, etiquetas in (("diego", "laura", ("TE-101", "PT-102")),
+                                           ("nuria", "laura", ("FT-103", "LT-104")),
+                                           ("ivan", "javier", ("PT-201", "LT-202"))):
+        for etiqueta in etiquetas:
+            ayudas.asignar(conexion, ids[tecnico], etiqueta, ids[supervisor])
+    ayudas.sembrar_nominal(conexion)
+    return ids
+
+
 @pytest.fixture(scope="session")
 def qapp():
     from PySide6.QtWidgets import QApplication
@@ -63,4 +108,13 @@ def qapp():
     from cliente.vista import estilos
     aplicacion = QApplication.instance() or QApplication([])
     aplicacion.setStyleSheet(estilos.HOJA)
-    return aplicacion
+    yield aplicacion
+    # Al acabar la sesión se destruyen las ventanas que queden mientras Qt aún está entero: si lo hace el intérprete al
+    # salir, con Qt ya apagado, el proceso se cae (violación de acceso en Windows, fallo de segmentación en Linux)
+    # después de haber pasado todas las pruebas.
+    for ventana in aplicacion.topLevelWidgets():
+        ventana.close()
+        ventana.deleteLater()
+    aplicacion.processEvents()
+    gc.collect()
+    aplicacion.processEvents()

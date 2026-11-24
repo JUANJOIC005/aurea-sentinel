@@ -55,6 +55,18 @@ class FalsaApi:
     def salud(self):
         return self.salud_ok
 
+    # Datos del panel del Supervisor (Sprint 2): vacíos, pero con la forma que devuelve el servidor
+    def lecturas_ultimas(self):
+        return self._llamar("lecturas_ultimas", {"sensores": [], "resumen": {
+            "sensores": 0, "en_rango": 0, "en_aviso": 0, "en_alarma": 0, "alarmas_activas": 0,
+            "tareas_abiertas": None, "lecturas_24h": 0, "validas_24h": 0, "pct_validas": None}})
+
+    def alarmas(self, filtro="activas"):
+        return self._llamar("alarmas", [], filtro)
+
+    def equipo(self):
+        return self._llamar("equipo", [])
+
 
 @pytest.fixture(autouse=True)
 def ajustes_limpios(qapp):
