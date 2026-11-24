@@ -29,7 +29,7 @@ Qué se ha hecho, cómo se ha instalado, cómo se usa y qué falta. Está escrit
 
 AUREA Sentinel es una **aplicación totalmente local**: un único programa que funciona en el propio equipo, con su base de datos SQLite en un archivo. No usa servicios externos, ni la nube, ni conexión a internet, y no hay que instalar, contratar ni configurar ningún servidor. La parte que atiende las peticiones (`servidor/`) es un módulo interno del programa: solo responde al propio equipo (`127.0.0.1`) y se para al cerrar la aplicación.
 
-**Para usarla (Windows):** descargar `AUREA Sentinel.exe` de la rama `production` del repositorio y abrirlo con doble clic. La primera vez crea su base de datos en `%APPDATA%\AUREA Sentinel\`, las 18 cuentas de demostración y **30 días de lecturas** de los 36 sensores (tarda unos 4 segundos y la base ocupa unos 33 MB). El `.exe` no está firmado digitalmente: Windows (SmartScreen o Defender) puede avisar la primera vez; hay que elegir «Más información → Ejecutar de todas formas». Lo construye GitHub Actions (`.github/workflows/exe.yml`) con Python 3.14. El `.exe` de `production` contiene el código del Sprint 1 hasta que se reconstruya con el del Sprint 2.
+**Para usarla (Windows):** descargar `AUREA Sentinel.exe` de la rama `production` del repositorio y abrirlo con doble clic. La primera vez crea su base de datos en `%APPDATA%\AUREA Sentinel\`, las 18 cuentas de demostración y **30 días de lecturas** de los 36 sensores (tarda unos 4 segundos y la base ocupa unos 33 MB). El `.exe` no está firmado digitalmente: Windows (SmartScreen o Defender) puede avisar la primera vez; hay que elegir «Más información → Ejecutar de todas formas». Lo construye GitHub Actions (`.github/workflows/exe.yml`) con Python 3.14. El `.exe` de `production` es el del Sprint 2, construido por GitHub Actions el 14/11/2026 a partir de `main`.
 
 **Para desarrollar (Debian 13):** todo viene de `apt`, sin pip (Debian trae Python 3.13; el `.exe` se construye con 3.14, y el código funciona con ambas).
 
@@ -56,7 +56,7 @@ Un único archivo SQLite: `~/.local/share/AUREA Sentinel/aurea sentinel.db` en L
 
 ### Cómo se construye el `.exe`
 
-PyInstaller no genera ejecutables de Windows desde Linux, por eso lo hace GitHub Actions en un Windows de GitHub (a mano desde *Actions → Ejecutable de Windows → Run workflow*, o automáticamente al subir a `main`). En un Windows propio: `pip install -r requirements.txt pillow` y `pyinstaller aurea_sentinel.spec`; sale `dist/AUREA Sentinel.exe`. Antes de construir, GitHub Actions pasa las pruebas. Falta una prueba completa de uso del `.exe` del Sprint 2 en Windows.
+PyInstaller no genera ejecutables de Windows desde Linux, por eso lo hace GitHub Actions en un Windows de GitHub (a mano desde *Actions → Ejecutable de Windows → Run workflow*, o automáticamente al subir a `main`). En un Windows propio: `pip install -r requirements.txt pillow` y `pyinstaller aurea_sentinel.spec`; sale `dist/AUREA Sentinel.exe`. Antes de construir, GitHub Actions pasa las pruebas. El `.exe` del Sprint 2 se probó en Windows 11 el 17/11/2026: primer arranque (18 cuentas y 30 días de lecturas en unos 11 s), login del Técnico, segundo paso con el QR y una aplicación autenticadora y panel del Supervisor, permisos (un sensor de otra área da 403), lectura sin firma rechazada y `--simulador` con 108 lecturas firmadas en 3 ciclos.
 
 ---
 
@@ -265,7 +265,7 @@ Con el módulo de datos real, una base de datos nueva y el simulador firmado com
 - Técnico (Diego): entra solo con la contraseña. Histórico de 7 días de un sensor suyo: 0,03 s.
 - Supervisor (Laura): el login responde que falta el código; se configura el segundo factor, un código malo da 401 («Te quedan 2 intentos»), uno bueno abre la sesión; ve los 4 sensores de su área; pedir un sensor de otra área da 403; exporta un CSV.
 
-**Sin hacer todavía:** abrir las ventanas 03, 04 y 05 en una pantalla real y escanear el QR con una aplicación autenticadora de verdad (lo comprueban Juan José, con las ventanas de T13, y Sergio, con el QR de T11); y abrir el `.exe` del Sprint 2 en Windows. Las capturas de las ventanas con datos reales se hicieron en modo sin pantalla.
+**Prueba con el `.exe` en Windows (17/11/2026):** las ventanas se abrieron en una pantalla real; el Técnico entra solo con la contraseña y ve su sesión con nombre, rol, área y supervisor, y la Supervisora escanea el QR con una aplicación autenticadora, entra con el código y ve su panel.
 
 ---
 
