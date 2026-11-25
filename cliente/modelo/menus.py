@@ -17,13 +17,13 @@ MENUS: dict[str, list[Seccion]] = {
         Seccion("panel", "Panel del área", "panel", "OPERACIÓN", "04", "Sprint 2 · T13"),
         Seccion("historico", "Histórico de sensores", "grafica", "OPERACIÓN", "05", "Sprint 2 · T13"),
         Seccion("equipo", "Equipo y tareas", "equipo", "OPERACIÓN", "06", "Sprint 3 · T17"),
-        Seccion("alarmas", "Alarmas", "campana", "OPERACIÓN", "04", "Sprint 3 · T15"),
+        Seccion("alarmas", "Alarmas", "campana", "OPERACIÓN", "04", "Sprint 3 · T17"),
         Seccion("informes", "Informes del área", "informe", "INFORMES", "05", "Sprint 4"),
     ],
     "tecnico": [
-        Seccion("turno", "Mi turno", "panel", "OPERACIÓN", "07", "Sprint 3 · T17"),
-        Seccion("sensores", "Mis sensores", "sensor", "OPERACIÓN", "07", "Sprint 3 · T17"),
-        Seccion("incidencias", "Incidencias", "informe", "OPERACIÓN", "08", "Sprint 3 · T17"),
+        Seccion("turno", "Mi turno", "panel", "MI TRABAJO", "07", "Sprint 3 · T17"),
+        Seccion("incidencias", "Mis incidencias", "informe", "MI TRABAJO", "08", "Sprint 3 · T17"),
+        Seccion("historico", "Histórico (7 días)", "grafica", "MI TRABAJO", "05", "Sprint 3 · T17"),
     ],
     "auditor": [
         Seccion("cumplimiento", "Cumplimiento", "escudo", "AUDITORÍA", "10", "Sprint 4 · T19"),

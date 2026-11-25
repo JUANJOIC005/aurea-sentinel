@@ -9,6 +9,8 @@ misma («prohibido») y queda anotada en el registro de auditoría.
   asignados  los sensores que el Supervisor ha asignado al Técnico
   agregados  solo estadísticas (mínimo, máximo, media), nunca lecturas sueltas
   todo       el inventario completo, en solo lectura
+  equipo     lo de los técnicos vinculados al Supervisor (tareas e incidencias de su equipo)
+  propias    solo lo que es de la propia persona (las tareas que tiene asignadas, sus incidencias)
 """
 from dataclasses import dataclass
 
@@ -27,6 +29,17 @@ PERMISOS: dict[tuple[str, str], dict[str, str]] = {
     ("alarmas", "ver"): {"supervisor": "area", "tecnico": "asignados"},
     ("equipo", "ver"): {"supervisor": "area"},
     ("sensores", "ver"): {"auditor": "todo", "administrador": "todo"},
+    # Sprint 3 (T15): trabajo entre el Supervisor y sus técnicos
+    ("alarmas", "reconocer"): {"supervisor": "area"},
+    ("tareas", "crear"): {"supervisor": "equipo"},
+    ("tareas", "ver"): {"supervisor": "equipo", "tecnico": "propias"},
+    ("tareas", "cambiar_estado"): {"tecnico": "propias"},
+    ("incidencias", "crear"): {"tecnico": "asignados"},
+    ("incidencias", "ver"): {"supervisor": "equipo", "tecnico": "propias", "auditor": "todo"},
+    # Sprint 3 (T16): registro de auditoría encadenado
+    ("auditoria", "ver"): {"auditor": "todo", "administrador": "propias"},
+    ("auditoria", "verificar"): {"auditor": "todo"},
+    ("auditoria", "exportar"): {"auditor": "todo"},
 }
 
 

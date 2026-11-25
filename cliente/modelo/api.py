@@ -98,6 +98,25 @@ class ClienteApi:
     def equipo(self) -> list[dict]:
         return self._llamar("GET", "/equipo")["tecnicos"]
 
+    def reconocer_alarma(self, alarma_id: int) -> dict:
+        return self._llamar("POST", f"/alarmas/{alarma_id}/reconocer")
+
+    # ── Tareas e incidencias (Sprint 3) ──
+    def tareas(self, estado: str | None = None) -> list[dict]:
+        return self._llamar("GET", "/tareas", params=_sin_vacios(estado=estado))["tareas"]
+
+    def crear_tarea(self, datos: dict) -> dict:
+        return self._llamar("POST", "/tareas", json=datos)
+
+    def cambiar_estado_tarea(self, tarea_id: int, estado: str) -> dict:
+        return self._llamar("PATCH", f"/tareas/{tarea_id}/estado", json={"estado": estado})
+
+    def incidencias(self, tag: str | None = None) -> list[dict]:
+        return self._llamar("GET", "/incidencias", params=_sin_vacios(tag=tag))["incidencias"]
+
+    def crear_incidencia(self, datos: dict) -> dict:
+        return self._llamar("POST", "/incidencias", json=datos)
+
     def salud(self) -> bool:
         try:
             self._llamar("GET", "/salud")

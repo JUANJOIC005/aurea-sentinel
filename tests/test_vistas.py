@@ -83,10 +83,10 @@ def test_navegar_cambia_el_titulo_y_la_vista(qapp):
 
 def test_cada_seccion_pendiente_dice_en_que_sprint_llega(qapp):
     ventana = VentanaBase(sesion("supervisor"), "x")
-    ventana.mostrar("equipo")
+    ventana.mostrar("informes")
     from PySide6.QtWidgets import QLabel
     todo = " ".join(l.text() for l in ventana.contenido.currentWidget().findChildren(QLabel))
-    assert "Sprint 3" in todo and "Ventana 06" in todo and "Laura Méndez Ortiz" in todo
+    assert "Sprint 4" in todo and "Ventana 05" in todo and "Laura Méndez Ortiz" in todo
 
 
 def test_una_ventana_real_sustituye_al_marcador(qapp):

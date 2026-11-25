@@ -1,6 +1,6 @@
-# AUREA Sentinel · Documentación del Sprint 2
+# AUREA Sentinel · Documentación del Sprint 3
 
-Qué se ha hecho, cómo se ha instalado, cómo se usa y qué falta. Está escrito para poder repetirlo en otro equipo. Recoge el Sprint 1 (la base) y el Sprint 2 (seguridad de acceso, lecturas firmadas, 30 días de datos y panel del Supervisor).
+Qué se ha hecho, cómo se ha instalado, cómo se usa y qué falta. Está escrito para poder repetirlo en otro equipo. Recoge el Sprint 1 (la base), el Sprint 2 (seguridad de acceso, lecturas firmadas, 30 días de datos y panel del Supervisor) y el Sprint 3 (trabajo entre roles y registro de actividad verificable).
 
 ---
 
@@ -8,7 +8,7 @@ Qué se ha hecho, cómo se ha instalado, cómo se usa y qué falta. Está escrit
 
 **Sprint 1 · T01 a T10.** Hechas, probadas y fusionadas en `main` (PR #32, etiqueta `v0.1.0`): repositorio y ramas, esqueleto MVC, base de datos y migraciones, login con Argon2id, registro pendiente, simulador v1, ventana base, ventanas de login y registro, análisis de amenazas con tabla de permisos y pruebas de login.
 
-**Sprint 2 · T11 a T14.** Hechas, probadas y fusionadas en `develop` el 12/11/2026: T11 (pull request #52), T12 (#53), T13 (#54) y T14 (#55).
+**Sprint 2 · T11 a T14.** Hechas, probadas y fusionadas el 12/11/2026 (pull request #52 a #55) y en `main` desde el 13/11 (#59).
 
 | Tarea | Responsable | Qué es | Estado |
 |---|---|---|---|
@@ -17,11 +17,20 @@ Qué se ha hecho, cómo se ha instalado, cómo se usa y qué falta. Está escrit
 | T13 | Juan José | Doble factor, panel del Supervisor e histórico | Hecho. Ventana 03 (código y QR), ventana 04 (panel con tarjetas, indicadores, alarmas y equipo) y ventana 05 (histórico con gráfica, tabla y CSV); 91 pruebas |
 | T14 | Itzel | Pruebas de permisos y de lecturas falsas | Hecho. 40 intentos de ver datos de otra área o de otro rol y 30 de colar lecturas falsas, con el resultado anotado en `docs/Resultados T14.md`; 74 pruebas |
 
-**Pruebas:** 486 en verde (144 del Sprint 1 y 342 del Sprint 2).
+**Sprint 3 · T15 a T18.** Hechas, probadas y fusionadas en `develop` el 25/11/2026, todas antes de su fecha límite: T15 (pull request #65), T16 (#68), T17 (#66) y T18 (#64).
 
-**Lo que ya se ve en la aplicación:** acceso con segundo paso, panel en directo y histórico del **Supervisor**. El Técnico, el Auditor y el Administrador entran, pero sus ventanas propias llegan en los Sprints 3 y 4; mientras tanto el servidor ya les limita lo que pueden pedir.
+| Tarea | Responsable | Qué es | Estado |
+|---|---|---|---|
+| T15 | Sergio | Tareas, incidencias y alarmas (servidor) | Hecho. El Supervisor asigna tareas a sus técnicos sobre sensores de su área; el Técnico cambia el estado de las suyas y registra incidencias y lecturas manuales de sus sensores; el Supervisor reconoce las alarmas de su área; 38 pruebas |
+| T16 | Gonzalo | Registro de auditoría encadenado y exportación | Hecho. Cada evento guarda la huella del anterior; la verificación dice qué evento se ha cambiado o borrado; el Auditor exporta el registro a CSV firmado; 22 pruebas |
+| T17 | Juan José | Ventanas Equipo y tareas, Mi turno e incidencia | Hecho. Ventanas 06, 07 y 08 según los mockups y la de alarmas con «Reconocer»; 39 pruebas |
+| T18 | Itzel | Pruebas de integración y manual de usuario | Hecho. 8 flujos completos entre roles y el borrador del manual de usuario (`docs/Manual de usuario.md`); 9 pruebas |
 
-**Cierre del sprint (13/11/2026):** `develop` pasó a `main` (pull request #59) y en `main` pasan las pruebas y se construye el `.exe`. Actas nº 04 a 07 firmadas, horas reales en el Product Backlog y capturas del tablero al inicio y al final. Queda la autoevaluación por pares, que sube cada persona.
+**Pruebas:** 594 en verde (144 del Sprint 1, 342 del Sprint 2 y 108 del Sprint 3).
+
+**Lo que ya se ve en la aplicación:** acceso con segundo paso; para el **Supervisor**, el panel en directo, el histórico, «Equipo y tareas» y las alarmas; para el **Técnico**, «Mi turno», el registro de incidencias y su histórico de 7 días. El Auditor y el Administrador entran, pero sus ventanas propias llegan en el Sprint 4; el servidor ya les limita lo que pueden pedir y ofrece al Auditor el registro verificable.
+
+**Cierre del Sprint 3 (25/11/2026):** las cuatro tareas en Done en el tablero, `develop` pasa a `main` y en `main` pasan las pruebas y se construye el `.exe`. Queda la autoevaluación por pares, que sube cada persona.
 
 ---
 
@@ -29,7 +38,7 @@ Qué se ha hecho, cómo se ha instalado, cómo se usa y qué falta. Está escrit
 
 AUREA Sentinel es una **aplicación totalmente local**: un único programa que funciona en el propio equipo, con su base de datos SQLite en un archivo. No usa servicios externos, ni la nube, ni conexión a internet, y no hay que instalar, contratar ni configurar ningún servidor. La parte que atiende las peticiones (`servidor/`) es un módulo interno del programa: solo responde al propio equipo (`127.0.0.1`) y se para al cerrar la aplicación.
 
-**Para usarla (Windows):** descargar `AUREA Sentinel.exe` de la rama `production` del repositorio y abrirlo con doble clic. La primera vez crea su base de datos en `%APPDATA%\AUREA Sentinel\`, las 18 cuentas de demostración y **30 días de lecturas** de los 36 sensores (tarda unos 4 segundos y la base ocupa unos 33 MB). El `.exe` no está firmado digitalmente: Windows (SmartScreen o Defender) puede avisar la primera vez; hay que elegir «Más información → Ejecutar de todas formas». Lo construye GitHub Actions (`.github/workflows/exe.yml`) con Python 3.14. El `.exe` de `production` contiene el código del Sprint 1 hasta que se reconstruya con el del Sprint 2.
+**Para usarla (Windows):** descargar `AUREA Sentinel.exe` de la rama `production` del repositorio y abrirlo con doble clic. La primera vez crea su base de datos en `%APPDATA%\AUREA Sentinel\`, las 18 cuentas de demostración y **30 días de lecturas** de los 36 sensores (tarda unos 4 segundos y la base ocupa unos 33 MB). El `.exe` no está firmado digitalmente: Windows (SmartScreen o Defender) puede avisar la primera vez; hay que elegir «Más información → Ejecutar de todas formas». Lo construye GitHub Actions (`.github/workflows/exe.yml`) con Python 3.14. El `.exe` de `production` es el del Sprint 2, construido por GitHub Actions el 14/11/2026 a partir de `main`.
 
 **Para desarrollar (Debian 13):** todo viene de `apt`, sin pip (Debian trae Python 3.13; el `.exe` se construye con 3.14, y el código funciona con ambas).
 
@@ -56,7 +65,7 @@ Un único archivo SQLite: `~/.local/share/AUREA Sentinel/aurea sentinel.db` en L
 
 ### Cómo se construye el `.exe`
 
-PyInstaller no genera ejecutables de Windows desde Linux, por eso lo hace GitHub Actions en un Windows de GitHub (a mano desde *Actions → Ejecutable de Windows → Run workflow*, o automáticamente al subir a `main`). En un Windows propio: `pip install -r requirements.txt pillow` y `pyinstaller aurea_sentinel.spec`; sale `dist/AUREA Sentinel.exe`. Antes de construir, GitHub Actions pasa las pruebas. Falta una prueba completa de uso del `.exe` del Sprint 2 en Windows.
+PyInstaller no genera ejecutables de Windows desde Linux, por eso lo hace GitHub Actions en un Windows de GitHub (a mano desde *Actions → Ejecutable de Windows → Run workflow*, o automáticamente al subir a `main`). En un Windows propio: `pip install -r requirements.txt pillow` y `pyinstaller aurea_sentinel.spec`; sale `dist/AUREA Sentinel.exe`. Antes de construir, GitHub Actions pasa las pruebas. El `.exe` del Sprint 2 se probó en Windows 11 el 17/11/2026: primer arranque (18 cuentas y 30 días de lecturas en unos 11 s), login del Técnico, segundo paso con el QR y una aplicación autenticadora y panel del Supervisor, permisos (un sensor de otra área da 403), lectura sin firma rechazada y `--simulador` con 108 lecturas firmadas en 3 ciclos.
 
 ---
 
@@ -76,6 +85,14 @@ PyInstaller no genera ejecutables de Windows desde Linux, por eso lo hace GitHub
 
 **Histórico.** Se elige sensor y periodo (24 horas, 7 días, 30 días o fechas propias) y se puede comparar con otro sensor de la misma unidad. Muestra mínimo, máximo y media, la gráfica con los umbrales y la tabla paginada. «Exportar CSV» guarda los datos en un archivo que abre Excel y queda anotado en el registro de auditoría.
 
+**Equipo y tareas (Supervisor, ventana 06).** La tabla de sus técnicos (sensores asignados, tareas abiertas, última actividad y si está disponible u ocupado), el tablero Pendiente · En curso · Hecha y el formulario «Nueva tarea», que solo ofrece sus técnicos y los sensores de su área. La prioridad se ve por el color del borde y por texto. Una tarea puede ir ligada a una alarma.
+
+**Alarmas (Supervisor).** Las alarmas del área con el mismo filtro que el panel; las abiertas tienen el botón «Reconocer». Una alarma reconocida se cierra sola cuando el valor vuelve al rango.
+
+**Mi turno (Técnico, ventana 07).** Una franja de aviso si uno de sus sensores entra en umbral, las tarjetas de sus sensores, «Mis tareas» (con Empezar, Terminar y Registrar), la gráfica de 7 días y las acciones rápidas. **Registrar incidencia (ventana 08)** es un diálogo con el sensor y la tarea ya elegidos, el tipo (inspección visual, lectura manual o anomalía), el valor medido comparado con el del sistema y su tolerancia (±1 % del rango) y las observaciones. Se valida en la ventana y otra vez en el servidor. El Técnico tiene también «Mis incidencias» y su «Histórico (7 días)».
+
+**Manual de usuario.** El borrador por rol, con capturas, está en `docs/Manual de usuario.md`.
+
 **Sesión.** Caduca sola (15 minutos Supervisor y Auditor, 30 Técnico, 10 Administrador) y vuelve a la pantalla de acceso; también se cierra con «Cerrar sesión».
 
 **Pedir una cuenta.** En la pantalla de acceso, «Registrarse»: la cuenta queda **pendiente**, sin poder entrar. La ventana del Administrador que las aprueba llega en el Sprint 4; mientras tanto se aprueba a mano con `sqlite3 "<archivo.db>" "UPDATE usuario SET estado='activo' WHERE correo='…'"`.
@@ -89,7 +106,7 @@ PyInstaller no genera ejecutables de Windows desde Linux, por eso lo hace GitHub
 | Auditor (2) | `beatriz.lara@cn-valdecierzo.es` |
 | Administrador (1) | `alvaro.campos@cn-valdecierzo.es` |
 
-Cada técnico tiene asignados sensores de su área: los cuatro de su supervisor si es el único, dos y dos si hay dos. La contraseña de demostración es pública a propósito (la aplicación se entrega para que el profesor la abra sin preparar nada). Una instalación real no debe sembrar cuentas con una contraseña conocida.
+Cada técnico tiene asignados sensores de su área: los cuatro de su supervisor si es el único, dos y dos si hay dos. La primera vez se crean también 3 tareas de ejemplo por técnico (una pendiente, una en curso y una hecha con su inspección). La contraseña de demostración es pública a propósito (la aplicación se entrega para que el profesor la abra sin preparar nada). Una instalación real no debe sembrar cuentas con una contraseña conocida.
 
 **Generar lecturas de sensores.** Con la aplicación abierta: `AUREA Sentinel.exe --simulador` (acepta `--intervalo`, `--ciclos`, `--semilla` y `--sin-excursiones`). El simulador busca la aplicación en `servidor.json` (que ella escribe al abrirse y borra al cerrarse), firma cada envío y lo manda al servidor, que valida la firma, el rango físico y la fecha antes de guardar. Escribe una lectura de los 36 sensores cada 5 s. Dos lecturas del mismo sensor en el mismo segundo cuentan como repetidas, así que no tiene sentido un intervalo menor de 1 s. Con `--destino bd` escribe directamente en la base de datos, sin firma y sin necesitar la aplicación.
 
@@ -111,6 +128,7 @@ Cada técnico tiene asignados sensores de su área: los cuatro de su supervisor 
 | Secreto del segundo factor | Tabla `segundo_factor` de la base de datos local | Hace falta en claro para calcular el código, así que lo protege el sistema operativo igual que el resto de la base. Es un límite conocido: en una instalación con varios equipos se guardaría cifrado |
 | Desafío entre contraseña y código | Tabla `desafio_2fa`: solo el hash del token, 5 minutos, 3 intentos | Mismo tratamiento que las sesiones |
 | Clave de firma de lecturas | Variable `AUREA_CLAVE_INGESTA` o, si no existe, un archivo `clave_ingesta.key` que se crea al azar junto a la base de datos | Nunca está en el repositorio. El servidor y el simulador son del mismo equipo y comparten la carpeta, así que no hay nada que copiar |
+| Clave de firma de los CSV de auditoría | Variable `AUREA_CLAVE_EXPORTACION` o, si no existe, un archivo `clave_exportacion.key` que se crea al azar junto a la base de datos | Distinta de la de las lecturas. Nunca está en el repositorio |
 | Último correo usado | Ajustes locales de Qt (`~/.config/AUREA AUDIT/`) | Solo el correo, nunca la contraseña. Se omite con «Equipo compartido» |
 
 Cifrado (TLS) solo haría falta si algún día los datos salen del equipo. Hoy todo es local: las ventanas y el módulo de datos están en el mismo programa y se hablan dentro del equipo (`127.0.0.1`, puerto libre elegido al arrancar), sin abrirse a la red.
@@ -128,23 +146,25 @@ aurea-sentinel/
 │   ├── local.py            prepara la base de datos, carga el histórico, activa el módulo y anota su dirección
 │   ├── db.py · migrate.py · config.py   conexión SQLite, migraciones y rutas
 │   ├── api/                operaciones: login, segundo factor, registro, datos públicos, lecturas e histórico, alarmas,
-│   │                       equipo, ingesta y permisos
+│   │                       equipo, ingesta, permisos, tareas e incidencias (trabajo.py) y registro de auditoría (registro.py)
 │   ├── migrations/         001_esquema · 002_catalogo (áreas, roles, 36 sensores) · 003_segundo_factor
 │   ├── seguridad.py        Argon2id, tokens, política de contraseñas
 │   ├── totp.py · qr.py · doble_factor.py   códigos de 6 dígitos, código QR y desafío
-│   ├── ingesta.py · claves.py   firma, validación de lecturas, alarmas y clave de firma
+│   ├── ingesta.py · claves.py   firma, validación de lecturas, alarmas y claves de firma
 │   ├── historico.py · descubrimiento.py     30 días de lecturas y el archivo servidor.json
-│   ├── usuarios.py · sesiones.py · auditoria.py   consultas a la base de datos
-│   └── datos_demo.py       las 18 cuentas de demostración y el reparto de sensores a los técnicos
+│   ├── usuarios.py · sesiones.py   consultas a la base de datos
+│   ├── auditoria.py        registro de eventos encadenado con huellas SHA-256 y su verificación
+│   └── datos_demo.py       las 18 cuentas de demostración, el reparto de sensores y las tareas de ejemplo
 ├── simulador/              modelo del sensor, destinos de las lecturas (base de datos o API firmada), línea de comandos
 ├── cliente/                ventanas de la aplicación de escritorio (PySide6)
 │   ├── modelo/             sesión, comunicación con el módulo de datos, formato de cifras y fechas, menús por rol
-│   ├── vista/              acceso, login, registro, verificación, panel, histórico, gráficas, tarjetas y estilos
-│   └── controlador/        acceso (con segundo paso), sesión abierta, panel del Supervisor y arranque
+│   ├── vista/              acceso, login, registro, verificación, panel, histórico, equipo y tareas, Mi turno,
+│   │                       incidencia, alarmas, gráficas, tarjetas y estilos
+│   └── controlador/        acceso (con segundo paso), sesión abierta, Supervisor, Técnico y arranque
 ├── scripts/                PDF de las actas, diagramas UML, capturas del Kanban, resultados de T14 y copia de este documento
 ├── equipo/                 ficha de cada miembro (tarea asignada y usuario de GitHub)
-├── tests/                  486 pruebas
-├── docs/                   resultados de las pruebas de T14
+├── tests/                  594 pruebas
+├── docs/                   resultados de las pruebas de T14 y manual de usuario (con sus capturas)
 ├── DOCUMENTACION.md        este documento
 └── .github/                plantillas de issue y de pull request, y el flujo que construye el .exe
 ```
@@ -153,9 +173,13 @@ aurea-sentinel/
 
 **Login y segundo factor.** El módulo de datos responde siempre con el mismo mensaje (no revela si el correo existe, si la contraseña falló o si la cuenta está bloqueada) y tarda lo mismo en cada caso. Para Supervisor, Auditor y Administrador, acertar la contraseña no abre sesión: abre un *desafío* de 5 minutos. El código TOTP (RFC 6238, implementación propia con HMAC-SHA1, 30 s, 6 dígitos y tolerancia de un intervalo) se comprueba en `/auth/2fa/activar` (la primera vez) o `/auth/2fa/verificar`. Cada error cuenta también para el bloqueo de la cuenta. Todo queda en `evento_auditoria`.
 
-**Permisos.** `servidor/api/permisos.py` contiene la tabla del apartado 6.2 como datos y una dependencia `requiere(recurso, acción)`. En cada petición se comprueba primero el rol, después el área o el vínculo, y solo entonces se consultan datos. Los ámbitos son: `area` (Supervisor), `asignados` (Técnico), `agregados` (Auditor) y `todo` (inventario). Lo que no está en la tabla está prohibido, y la respuesta es siempre el mismo 403 y un evento `acceso_denegado`.
+**Permisos.** `servidor/api/permisos.py` contiene la tabla del apartado 6.2 como datos y una dependencia `requiere(recurso, acción)`. En cada petición se comprueba primero el rol, después el área o el vínculo, y solo entonces se consultan datos. Los ámbitos son: `area` (Supervisor), `asignados` (Técnico), `agregados` (Auditor), `todo` (inventario y registro completo), `equipo` (lo de los técnicos del Supervisor) y `propias` (lo de la propia persona). Lo que no está en la tabla está prohibido, y la respuesta es siempre el mismo 403 y un evento `acceso_denegado`.
 
 **Ingesta firmada.** `POST /ingesta/lecturas` recibe hasta 500 lecturas con dos cabeceras: `X-Aurea-Marca` (la hora del envío, a ±300 s de la del servidor) y `X-Aurea-Firma` (`HMAC-SHA256(clave, marca + "." + cuerpo)`). Cada lectura se valida por separado: sensor conocido y activo, valor dentro del rango físico del sensor (y finito), fecha ni del futuro ni de hace más de 31 días. Se guarda lo válido y se anota lo rechazado. Una lectura repetida no pisa a la original. Al guardar se calcula el estado de cada sensor y se abre, escala o cierra su alarma.
+
+**Tareas e incidencias (T15).** `POST /tareas` comprueba que el técnico es del Supervisor y que el sensor (o la alarma) es de su área; `PATCH /tareas/{id}/estado` solo lo hace el técnico al que está asignada, y al pasar a «hecha» se guarda la fecha de cierre. `POST /incidencias` exige que el sensor esté asignado al técnico y, si hay tarea, que sea suya y del mismo sensor; una lectura manual necesita un valor dentro del rango físico. La respuesta incluye el último valor del sistema y la diferencia. `POST /alarmas/{id}/reconocer` solo vale para alarmas abiertas del área del Supervisor. Todo queda en `evento_auditoria`.
+
+**Registro encadenado (T16).** Cada evento guarda `hash_anterior` y `hash` = SHA-256 de la huella anterior y de su contenido (instante, actor, acción, recurso, resultado y detalle). Antes de leer la última huella se reserva la escritura (`BEGIN IMMEDIATE`), así que dos peticiones a la vez no pueden enlazar con el mismo evento. `verificar` recorre el registro y dice el primer evento roto: cambiado, borrado o colado sin huella. La exportación es un CSV con una cabecera (fecha, número de eventos, estado de la cadena y última huella) y, en la última línea, su firma HMAC-SHA256; `POST /auditoria/comprobar-firma` comprueba que nadie lo ha tocado. Los eventos anteriores al Sprint 3, sin huella, se cuentan aparte.
 
 **Datos de prueba.** `servidor/historico.py` genera 30 días de lecturas (una cada 5 minutos, unas 311.000 filas) con el mismo modelo que el simulador y una semilla fija, así que sale siempre igual.
 
@@ -167,7 +191,7 @@ aurea-sentinel/
 - La cabecera dice «Servidor conectado» en vez de «Datos en vivo». Los datos en vivo ya existen en el panel del Supervisor; el rótulo de la cabecera se cambia en un sprint posterior.
 - El pie del menú no dice «MFA verificado»: la verificación ya existe, pero el pie todavía no lo muestra.
 - La barra de estado no muestra «TLS 1.3»: todo es local y no sale del equipo.
-- El indicador «Tareas abiertas del equipo» del panel enseña «—» hasta el Sprint 3 (T15), y el botón de asignar tarea queda a la espera.
+- El diálogo de incidencia (mockup 08) no adjunta ficheros (certificado o foto): el servidor no guarda ficheros. La referencia del certificado se escribe en las observaciones.
 - El logo es el oficial de AUREA AUDIT, sacado del PDF de imagen corporativa entregado en Canvas (`cliente/recursos/aurea_isotipo.png`, solo la «A»). Es una imagen de 590×475 px: se ve nítida en los paneles de acceso, pero convendría tener el original en vector.
 - La fuente es Aptos si está instalada y, si no, Segoe UI o Noto Sans.
 - El formulario de registro lista los supervisores del área antes de iniciar sesión, como en el mockup. Eso enseña nombres de personal a quien aún no se ha identificado; si el CTO lo considera un riesgo, se cambia por escribir el correo del supervisor.
@@ -182,19 +206,20 @@ aurea-sentinel/
 |---|---|---|---|
 | **Cliente** | Alguien roba la contraseña mirando la pantalla o con un programa que registra teclas | Contraseña oculta, con botón para verla; no se guarda en disco. Aun con la contraseña, hace falta el código del móvil | Hecho |
 | | Alguien usa un equipo que otra persona dejó abierto | Sesión con caducidad por rol y botón «Cerrar sesión»; al caducar vuelve al login | Hecho |
-| | Alguien manipula el cliente para ver otra área | El cliente solo esconde menús; **el módulo de datos decide** qué se devuelve (40 intentos probados en T14) | Hecho para lecturas, histórico, alarmas, equipo e inventario. Tareas e incidencias, en el Sprint 3 |
+| | Alguien manipula el cliente para ver otra área | El cliente solo esconde menús; **el módulo de datos decide** qué se devuelve (40 intentos probados en T14) | Hecho para lecturas, histórico, alarmas, equipo, inventario, tareas, incidencias y registro de auditoría |
 | **Módulo de datos** | Adivinar contraseñas probando muchas | Bloqueo de 15 min tras 5 fallos; contraseña mínima de 12 caracteres y lista de contraseñas filtradas | Hecho |
 | | Descubrir qué correos existen | Mismo mensaje y mismo tiempo de respuesta con cualquier fallo; el registro responde igual si el correo ya existe | Hecho |
 | | Robar un token de sesión | Token aleatorio de 256 bits, solo su hash en la base de datos, caducidad, se invalida al cerrar sesión o al bloquear la cuenta | Hecho |
 | | Enviar datos mal formados o enormes | Validación de todos los campos con límites de longitud; las contraseñas largas se limitan a 256 caracteres; un envío de lecturas admite como máximo 500 | Hecho |
 | | Espiar la comunicación entre las ventanas y el módulo de datos | Es interna del equipo (`127.0.0.1`), sin red; TLS solo si algún día sale | No aplica hoy |
 | | Saltarse el segundo factor | Código de 6 dígitos obligatorio para Supervisor, Auditor y Administrador; el desafío caduca a los 5 minutos y se cierra con 3 errores; un código no vale dos veces | Hecho (Sprint 2, T11) |
-| **Base de datos** | Que alguien con acceso edite o borre el rastro de lo que hizo | El registro de auditoría no admite `UPDATE` ni `DELETE` (lo impide la propia base) | Hecho. La cadena de hashes llega en el Sprint 3 (T16) |
+| **Base de datos** | Que alguien con acceso edite o borre el rastro de lo que hizo | El registro de auditoría no admite `UPDATE` ni `DELETE` (lo impide la propia base) | Hecho. Además, cadena de huellas: si se cambia o se borra un evento, la verificación dice cuál (Sprint 3, T16) |
 | | Datos incoherentes (técnico sin supervisor, umbrales al revés, lecturas duplicadas, sensores de otra área asignados a un técnico) | Claves, restricciones y disparadores en las tablas | Hecho |
 | | Robo de contraseñas si se filtra la base | Solo hashes Argon2id | Hecho |
+| | Que un técnico registre trabajo sobre sensores o tareas que no son suyos | El servidor exige que el sensor esté asignado al técnico y que la tarea sea suya y del mismo sensor | Hecho (Sprint 3, T15) |
 | **Simulador** | Que alguien envíe lecturas falsas haciéndose pasar por él | Firma HMAC de cada envío con marca de tiempo, rango físico válido y fecha razonable; 30 intentos probados en T14 | Hecho (Sprint 2, T12) |
 
-### 6.2 Qué puede hacer cada rol (implementado en el Sprint 2 hasta donde dice la última columna)
+### 6.2 Qué puede hacer cada rol (implementado hasta donde dice la última columna)
 
 «Su área» = el área del supervisor. «Sus sensores» = los que le asigna su supervisor. Todo lo que no está aquí está prohibido.
 
@@ -204,20 +229,20 @@ aurea-sentinel/
 | Histórico de sensores | Ver | 30 días, su área | 7 días, sus sensores | Agregados | — | Hecho (T11) |
 | | Exportar CSV | Sí (queda en el registro) | — | — | — | Hecho (T11) |
 | Alarmas | Ver | Su área | De sus sensores | Solo en informes | — | Hecho (T11) |
-| | Reconocer | Sí | — | — | — | Sprint 3 |
-| Tareas | Crear y asignar | A sus técnicos | — | — | — | Sprint 3 |
-| | Ver | Las de su equipo | Las suyas | — | — | Sprint 3 |
-| | Cambiar estado | — | Las suyas | — | — | Sprint 3 |
-| Incidencias | Crear | — | Sobre sus sensores | — | — | Sprint 3 |
-| | Ver | Las de su equipo | Las suyas | Solo lectura | — | Sprint 3 |
+| | Reconocer | Sí | — | — | — | Hecho (T15) |
+| Tareas | Crear y asignar | A sus técnicos | — | — | — | Hecho (T15) |
+| | Ver | Las de su equipo | Las suyas | — | — | Hecho (T15) |
+| | Cambiar estado | — | Las suyas | — | — | Hecho (T15) |
+| Incidencias | Crear | — | Sobre sus sensores | — | — | Hecho (T15) |
+| | Ver | Las de su equipo | Las suyas | Solo lectura, sin nombres | — | Hecho (T15) |
 | Cuentas | Solicitar | Cualquiera, sin sesión | | | | Hecho (Sprint 1) |
 | | Aprobar, bloquear, editar | — | — | — | Sí | Sprint 4 |
 | Vínculos supervisor → técnico | Asignar | — | — | — | Sí | Sprint 4 (hoy los fija la demo) |
 | Sensores y umbrales | Ver inventario | — | — | Solo lectura | Sí | Hecho (T11) |
 | | Editar umbral | — | — | — | Sí, con motivo y segundo factor | Sprint 4 |
 | Equipo | Ver técnicos del supervisor | Su equipo | — | — | — | Hecho (T11) |
-| Registro de auditoría | Ver | — | — | Todo, con nombres ocultos | Solo sus propios eventos | Sprint 3 |
-| | Verificar y exportar | — | — | Sí | — | Sprint 3 |
+| Registro de auditoría | Ver | — | — | Todo, con nombres ocultos | Solo sus propios eventos | Hecho en el servidor (T16); ventana en el Sprint 4 |
+| | Verificar y exportar | — | — | Sí (CSV firmado) | — | Hecho en el servidor (T16); ventana en el Sprint 4 |
 
 Regla general: en cada petición el módulo de datos comprueba **rol**, luego **área o vínculo**, y solo entonces consulta datos. Si algo no coincide responde «prohibido» y lo anota en el registro.
 
@@ -225,7 +250,7 @@ Regla general: en cada petición el módulo de datos comprueba **rol**, luego **
 
 ## 7. Pruebas
 
-**486 pruebas en verde**, repetidas varias veces seguidas sin fallos intermitentes. **Cobertura del 95 %** en `servidor`, `simulador`, `cliente/modelo` y `cliente/controlador` (medida el 13/11/2026 sobre `main`, con las pruebas repartidas en procesos como en GitHub Actions); el requisito RNF-08 pide al menos el 70 %.
+**594 pruebas en verde**, repetidas varias veces seguidas sin fallos intermitentes. **Cobertura del 94 %** en `servidor`, `simulador`, `cliente/modelo` y `cliente/controlador` (medida el 25/11/2026 sobre `develop` con el Sprint 3, con las pruebas repartidas en procesos como en GitHub Actions); el requisito RNF-08 pide al menos el 70 %.
 
 | Archivo | Pruebas | Qué comprueba |
 |---|---|---|
@@ -252,6 +277,11 @@ Regla general: en cada petición el módulo de datos comprueba **rol**, luego **
 | `test_controlador_supervisor.py` | 21 | Refresco del panel, errores, exportación a CSV |
 | **T14** `test_permisos_por_area.py` | 43 | 40 intentos de ver datos de otra área o de otro rol y 3 comprobaciones generales |
 | `test_lecturas_falsas.py` | 31 | 30 intentos de colar lecturas falsas y el recuento |
+| **T15** `test_trabajo.py` | 38 | Crear, ver y mover tareas; incidencias y lecturas manuales; reconocer alarmas; permisos de cada rol; tareas de ejemplo |
+| **T16** `test_auditoria_cadena.py` | 22 | Enlace entre eventos, detección de cambios y borrados, escrituras a la vez, consulta sin nombres, CSV firmado y su comprobación |
+| **T17** `test_vistas_sprint3.py` | 26 | Ventanas 06, 07 y 08, alarmas e incidencias con datos de ejemplo |
+| `test_controlador_tecnico.py` | 13 | Las ventanas del Sprint 3 contra el servidor real: asignar, reconocer, mover tareas y registrar |
+| **T18** `test_integracion.py` | 9 | 8 flujos completos entre roles (cada uno termina con el registro íntegro) y el manual de usuario |
 
 Las pruebas **nunca tocan los datos del usuario**: usan una base SQLite temporal (`AUREA_BD` apunta a una carpeta temporal) que se recrea desde cero antes de cada prueba, y no cargan los 30 días de histórico (`AUREA_SIN_HISTORICO`). El resultado de cada caso de T14 está en `docs/Resultados T14.md`.
 
@@ -265,24 +295,23 @@ Con el módulo de datos real, una base de datos nueva y el simulador firmado com
 - Técnico (Diego): entra solo con la contraseña. Histórico de 7 días de un sensor suyo: 0,03 s.
 - Supervisor (Laura): el login responde que falta el código; se configura el segundo factor, un código malo da 401 («Te quedan 2 intentos»), uno bueno abre la sesión; ve los 4 sensores de su área; pedir un sensor de otra área da 403; exporta un CSV.
 
-**Sin hacer todavía:** abrir las ventanas 03, 04 y 05 en una pantalla real y escanear el QR con una aplicación autenticadora de verdad (lo comprueban Juan José, con las ventanas de T13, y Sergio, con el QR de T11); y abrir el `.exe` del Sprint 2 en Windows. Las capturas de las ventanas con datos reales se hicieron en modo sin pantalla.
+**Flujos entre roles (Sprint 3, T18):** el Supervisor asigna, el Técnico registra y el Supervisor lo ve; una alarma se abre, se reconoce, se atiende y se cierra sola; nadie se sale de lo suyo; el Auditor verifica y exporta; entrada con segundo factor; desde el cliente de escritorio; sesión caducada; y una jornada con mucha actividad a la vez.
+
+**Prueba con el `.exe` en Windows (17/11/2026):** las ventanas se abrieron en una pantalla real; el Técnico entra solo con la contraseña y ve su sesión con nombre, rol, área y supervisor, y la Supervisora escanea el QR con una aplicación autenticadora, entra con el código y ve su panel.
 
 ---
 
 ## 9. Qué falta
 
-**Hecho en el Sprint 2:**
-1. T11 a T14 fusionadas en `develop` el 12/11 (pull request #52 a #55) y 486 pruebas en verde.
-2. Arreglo de las pruebas de ventanas en Windows (#58), documentación del Sprint 2 (#57) y `develop` en `main` (#59) el 13/11; en `main` pasan las pruebas y se construye el `.exe`.
-3. Tablero con las columnas Sprint Backlog, To Do, Doing y Done, T01 a T14 en Done y capturas de inicio y de final del sprint.
-4. Actas nº 04 (planificación, 02/11), 05 (seguimiento, 11/11), 06 (integración, 12/11) y 07 (revisión y retrospectiva, 13/11), firmadas por los cuatro.
-5. Product Backlog con el Sprint Backlog del Sprint 2 y las horas reales, y lista de requisitos con su estado: 10 cumplidos, 7 parciales y 3 pendientes (planificados para los Sprints 3 y 4).
+**Hecho en el Sprint 3:**
+1. T15 a T18 fusionadas en `develop` el 25/11, en el orden previsto y antes de sus fechas límite (pull request #65, #68, #66 y #64). 594 pruebas en verde.
+2. Tablero con T01 a T18 en Done y capturas de inicio y de final del sprint.
+3. `develop` en `main`, con las pruebas y el `.exe` construidos por GitHub Actions.
+4. Product Backlog con el Sprint Backlog del Sprint 3 y la lista de requisitos al día: RF-06, RF-07, RF-08 y RF-09 pasan a cumplidos.
 
-**Pendiente para cerrar el Sprint 2:** la autoevaluación por pares (cada persona sube la suya).
+**Pendiente para cerrar el Sprint 3:** las actas de las reuniones del sprint y la autoevaluación por pares (cada persona sube la suya).
 
-**Observación para el Sprint 3:** con una firma válida, la ingesta acepta un valor `true` o un número escrito como texto (lo encontró T14); se corrige declarando el campo como número estricto.
-
-**Sprint 3 (16/11 al 29/11):** tareas, incidencias y alarmas (T15), registro de auditoría encadenado y exportación (T16), ventanas de equipo, Mi turno e incidencia (T17), pruebas de integración y manual (T18).
+**Observación para el Sprint 4:** con una firma válida, la ingesta acepta un valor `true` o un número escrito como texto (lo encontró T14); se corrige declarando el campo como número estricto.
 
 **Sprint 4 (30/11 al 13/12):** Auditor y Administrador (T19) y pruebas finales, instalación portable y memoria (T20).
 
@@ -290,11 +319,11 @@ Con el módulo de datos real, una base de datos nueva y el simulador firmado com
 
 ## 10. GitHub, tablero y acta
 
-**Repositorio:** público, `JUANJOIC005/aurea-sentinel`. Ramas: `main` (versión entregada), `develop` (integración), `production` y una rama `tarea/Txx` por tarea. Cada tarea entra en `develop` con una pull request que cierra su issue; el Sprint 1 pasó a `main` con la pull request #32 (etiqueta `v0.1.0`). Las tareas del Sprint 2 entraron en `develop` el 12/11 en este orden: T11 (pull request #52), T12 (#53), T13 (#54) y T14 (#55).
+**Repositorio:** público, `JUANJOIC005/aurea-sentinel`. Ramas: `main` (versión entregada), `develop` (integración), `production` y una rama `tarea/Txx` por tarea. Cada tarea entra en `develop` con una pull request que cierra su issue; el Sprint 1 pasó a `main` con la pull request #32 (etiqueta `v0.1.0`). Las tareas del Sprint 2 entraron en `develop` el 12/11 en este orden: T11 (pull request #52), T12 (#53), T13 (#54) y T14 (#55). Las del Sprint 3, el 25/11: T15 (#65), T16 (#68), T17 (#66) y T18 (#64).
 
 **Rama `production`:** contiene el código y el ejecutable ya compilado, `AUREA Sentinel.exe`, para abrirlo sin compilar. La rama `main` es la de pruebas y compilación: al subir a `main`, GitHub Actions pasa las pruebas y construye el `.exe`.
 
-**Scrum Master y entrega:** Juan José Ibáñez fue el Scrum Master del Sprint 1. En el Sprint 2 lo es Gonzalo Revuelta, que lleva el repositorio, fusiona las pull request en `develop` y en `main` y entrega el proyecto al profesor. Sergio García es el Product Owner.
+**Scrum Master y entrega:** el Scrum Master cambia en cada sprint: Juan José Ibáñez en el Sprint 1, Gonzalo Revuelta en el Sprint 2 e Itzel Fajardo en el Sprint 3. El Scrum Master del sprint revisa y fusiona las pull request en `develop` y en `main`, lleva el tablero y las actas y entrega el proyecto al profesor. Sergio García es el Product Owner.
 
 **Issues #1 a #20:** una por tarea del backlog (T01 a T20), con su hito (Sprint 1 a 4, con fecha de fin), prioridad y responsable como etiquetas, y el texto de la tarea con su criterio de «hecho».
 
@@ -304,6 +333,6 @@ Con el módulo de datos real, una base de datos nueva y el simulador firmado com
 
 **Actas:** se hacen con la plantilla de actas de AUREA AUDIT (`scripts/actas_pdf.py` genera las del Sprint 1). Las del Sprint 2 son la nº 04 a la 07, redactadas por el Scrum Master con la fecha, la hora, el lugar, los asistentes y los acuerdos de cada reunión, y firmadas por los cuatro.
 
-**Product Backlog y lista de requisitos:** el Product Backlog (Excel, con la plantilla del profesor) y la lista de requisitos (PDF) se actualizan al cierre de cada sprint y se entregan junto con el resto. Los del Sprint 2 se entregan con el resto: el Excel lleva la hoja del Sprint Backlog del Sprint 2, las horas reales y la hoja de requisitos, y la lista de requisitos va también en PDF.
+**Product Backlog y lista de requisitos:** el Product Backlog (Excel, con la plantilla del profesor) y la lista de requisitos (PDF) se actualizan al cierre de cada sprint y se entregan junto con el resto. Los de cada sprint se entregan con el resto: el Excel lleva una hoja de Sprint Backlog por sprint, las horas reales y la hoja de requisitos, y la lista de requisitos va también en PDF.
 
 **Entregables del Sprint 2 en Canvas** («SPRINT 2 - DESARROLLO», hasta el 15 de noviembre a las 23:59): todas las actas de reunión del sprint en PDF; dos capturas del tablero Kanban (estado de todas las tareas al inicio y al final del sprint); enlace a GitHub con la rama principal actualizada y funcionando; copia del proyecto en `.zip` de la última versión funcional; y esta documentación actualizada al final del sprint. Además, cada miembro sube su Excel a la tarea de evaluación entre pares (si falta uno, el equipo entero tiene un 0 en esa parte). La rúbrica puntúa también que el Product Backlog y la lista de requisitos estén actualizados y concuerden con el proyecto, por eso se entregan con el resto.

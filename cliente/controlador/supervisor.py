@@ -1,4 +1,5 @@
-"""Controlador del Supervisor: conecta el panel (ventana 04) y el histórico (ventana 05) con el servidor."""
+"""Controlador del Supervisor: conecta el panel (ventana 04), el histórico (05), el equipo y sus tareas (06) y las
+alarmas con el servidor."""
 from pathlib import Path
 
 from PySide6.QtCore import QObject, QTimer
@@ -6,6 +7,8 @@ from PySide6.QtWidgets import QFileDialog
 
 from ..modelo.api import ClienteApi, ErrorApi, ErrorConexion
 from ..modelo.sesion import Sesion
+from ..vista.alarmas import VistaAlarmas
+from ..vista.equipo import VistaEquipo
 from ..vista.historico import VistaHistorico
 from ..vista.panel import VistaPanel
 from ..vista.ventana_base import VentanaBase
@@ -28,14 +31,22 @@ class ControladorSupervisor(QObject):
         area = sesion.usuario.area
         self.panel = VistaPanel(area.codigo if area else "")
         self.historico = VistaHistorico()
+        self.equipo = VistaEquipo(sesion.usuario.nombre, area.codigo if area else "")
+        self.alarmas = VistaAlarmas()
         ventana.registrar_vista("panel", self.panel)
         ventana.registrar_vista("historico", self.historico)
+        ventana.registrar_vista("equipo", self.equipo)
+        ventana.registrar_vista("alarmas", self.alarmas)
         ventana.mostrar("panel")
 
         self.panel.abrir_historico.connect(self.abrir_historico)
         self.panel.filtro_alarmas.connect(self.cambiar_filtro)
         self.historico.consultar.connect(self.consultar)
         self.historico.exportar.connect(self.exportar)
+        self.panel.asignar_tarea.connect(lambda: self.ventana.mostrar("equipo"))
+        self.equipo.crear.connect(self.crear_tarea)
+        self.alarmas.filtro.connect(lambda _f: self.refrescar_alarmas())
+        self.alarmas.reconocer.connect(self.reconocer)
         ventana.seccion_elegida.connect(self._al_cambiar_de_seccion)
 
         self._etiquetas: list[str] = []
@@ -64,9 +75,11 @@ class ControladorSupervisor(QObject):
         self.panel.poner_alarmas(alarmas)
         self.panel.poner_equipo(equipo)
         etiquetas = [s["tag"] for s in ultimas["sensores"]]
-        if etiquetas != self._etiquetas:             # el histórico ofrece los mismos sensores que el panel
+        if etiquetas != self._etiquetas:             # el histórico y «Nueva tarea» ofrecen los mismos sensores
             self._etiquetas = etiquetas
             self.historico.poner_sensores(ultimas["sensores"])
+            self.equipo.poner_sensores(ultimas["sensores"])
+        self.equipo.poner_equipo(equipo)
 
     def cambiar_filtro(self, _filtro: str) -> None:
         try:
@@ -79,10 +92,66 @@ class ControladorSupervisor(QObject):
     def _al_tic(self) -> None:
         if self.panel.isVisible():
             self.refrescar()
+        elif self.alarmas.isVisible():
+            self.refrescar_alarmas()
 
     def _al_cambiar_de_seccion(self, clave: str) -> None:
         if clave == "panel":
             self.refrescar()
+        elif clave == "equipo":
+            self.refrescar_equipo()
+        elif clave == "alarmas":
+            self.refrescar_alarmas()
+
+    def _fallo(self, vista, error: Exception) -> None:
+        vista.mostrar_error(error.mensaje if isinstance(error, ErrorApi) else SIN_CONEXION.format(servidor=self.api.servidor))
+
+    # ── Equipo y tareas (ventana 06) ──
+    def refrescar_equipo(self) -> None:
+        try:
+            equipo, tareas = self.api.equipo(), self.api.tareas()
+            if not self._etiquetas:
+                ultimas = self.api.lecturas_ultimas()
+                self._etiquetas = [s["tag"] for s in ultimas["sensores"]]
+                self.historico.poner_sensores(ultimas["sensores"])
+                self.equipo.poner_sensores(ultimas["sensores"])
+        except (ErrorApi, ErrorConexion) as error:
+            self._fallo(self.equipo, error)
+            return
+        self.equipo.mostrar_error(None)
+        self.equipo.poner_equipo(equipo)
+        self.equipo.poner_tareas(tareas)
+
+    def crear_tarea(self, datos: dict) -> None:
+        try:
+            tarea = self.api.crear_tarea(datos)
+        except ErrorApi as error:
+            self.equipo.mostrar_resultado(False, error.mensaje)
+            return
+        except ErrorConexion:
+            self.equipo.mostrar_resultado(False, SIN_CONEXION.format(servidor=self.api.servidor))
+            return
+        self.equipo.limpiar_formulario()
+        self.equipo.mostrar_resultado(True, f"Tarea asignada a {tarea['tecnico']['nombre']}. Queda registrada.")
+        self.refrescar_equipo()
+
+    # ── Alarmas ──
+    def refrescar_alarmas(self) -> None:
+        try:
+            lista = self.api.alarmas(self.alarmas.filtro_actual())
+        except (ErrorApi, ErrorConexion) as error:
+            self._fallo(self.alarmas, error)
+            return
+        self.alarmas.mostrar_error(None)
+        self.alarmas.poner(lista)
+
+    def reconocer(self, alarma_id: int) -> None:
+        try:
+            self.api.reconocer_alarma(alarma_id)
+        except (ErrorApi, ErrorConexion) as error:
+            self._fallo(self.alarmas, error)
+            return
+        self.refrescar_alarmas()
 
     # ── Histórico ──
     def abrir_historico(self, tag: str) -> None:

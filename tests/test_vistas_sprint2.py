@@ -400,9 +400,12 @@ def test_el_equipo_lista_a_los_tecnicos_vinculados(qapp, panel):
     assert not panel.error.isVisibleTo(panel)
 
 
-def test_el_boton_de_asignar_tarea_espera_al_sprint_3(panel):
+def test_el_boton_de_asignar_tarea_lleva_a_equipo_y_tareas(panel):
     boton = [b for b in panel.findChildren(type(panel._botones_filtro["hoy"])) if "Asignar" in b.text()][0]
-    assert not boton.isEnabled() and "Sprint 3" in boton.toolTip()
+    pulsado = []
+    panel.asignar_tarea.connect(lambda: pulsado.append(True))
+    boton.click()
+    assert boton.isEnabled() and pulsado == [True]
 
 
 def test_el_panel_avisa_del_area_y_de_los_errores(panel):
