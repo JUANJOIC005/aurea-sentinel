@@ -36,6 +36,10 @@ PERMISOS: dict[tuple[str, str], dict[str, str]] = {
     ("tareas", "cambiar_estado"): {"tecnico": "propias"},
     ("incidencias", "crear"): {"tecnico": "asignados"},
     ("incidencias", "ver"): {"supervisor": "equipo", "tecnico": "propias", "auditor": "todo"},
+    # Sprint 3 (T16): registro de auditoría encadenado
+    ("auditoria", "ver"): {"auditor": "todo", "administrador": "propias"},
+    ("auditoria", "verificar"): {"auditor": "todo"},
+    ("auditoria", "exportar"): {"auditor": "todo"},
 }
 
 
