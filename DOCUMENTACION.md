@@ -30,7 +30,7 @@ Qué se ha hecho, cómo se ha instalado, cómo se usa y qué falta. Está escrit
 
 **Lo que ya se ve en la aplicación:** acceso con segundo paso; para el **Supervisor**, el panel en directo, el histórico, «Equipo y tareas» y las alarmas; para el **Técnico**, «Mi turno», el registro de incidencias y su histórico de 7 días. El Auditor y el Administrador entran, pero sus ventanas propias llegan en el Sprint 4; el servidor ya les limita lo que pueden pedir y ofrece al Auditor el registro verificable.
 
-**Cierre del Sprint 3 (25/11/2026):** las cuatro tareas en Done en el tablero, `develop` pasa a `main` y en `main` pasan las pruebas y se construye el `.exe`. Queda la autoevaluación por pares, que sube cada persona.
+**Cierre del Sprint 3 (26/11/2026):** las cuatro tareas en Done en el tablero, `develop` pasa a `main` y en `main` pasan las pruebas y se construye el `.exe`. Actas nº 08 a 12 firmadas, horas reales en el Product Backlog y capturas del tablero al inicio y al final. Queda la autoevaluación por pares, que sube cada persona.
 
 ---
 
@@ -307,9 +307,10 @@ Con el módulo de datos real, una base de datos nueva y el simulador firmado com
 1. T15 a T18 fusionadas en `develop` el 25/11, en el orden previsto y antes de sus fechas límite (pull request #65, #68, #66 y #64). 594 pruebas en verde.
 2. Tablero con T01 a T18 en Done y capturas de inicio y de final del sprint.
 3. `develop` en `main`, con las pruebas y el `.exe` construidos por GitHub Actions.
-4. Product Backlog con el Sprint Backlog del Sprint 3 y la lista de requisitos al día: RF-06, RF-07, RF-08 y RF-09 pasan a cumplidos.
+4. Product Backlog con el Sprint Backlog del Sprint 3, las horas reales y la lista de requisitos al día: RF-06, RF-07, RF-08 y RF-09 pasan a cumplidos.
+5. Actas nº 08 (planificación, 20/11), 09 (sesión de trabajo, 24/11), 10 (seguimiento, 24/11), 11 (revisión y retrospectiva, 25/11) y 12 (cierre y entrega, 26/11), firmadas por los cuatro.
 
-**Pendiente para cerrar el Sprint 3:** las actas de las reuniones del sprint y la autoevaluación por pares (cada persona sube la suya).
+**Pendiente para cerrar el Sprint 3:** la autoevaluación por pares (cada persona sube la suya).
 
 **Observación para el Sprint 4:** con una firma válida, la ingesta acepta un valor `true` o un número escrito como texto (lo encontró T14); se corrige declarando el campo como número estricto.
 
@@ -323,7 +324,7 @@ Con el módulo de datos real, una base de datos nueva y el simulador firmado com
 
 **Rama `production`:** contiene el código y el ejecutable ya compilado, `AUREA Sentinel.exe`, para abrirlo sin compilar. La rama `main` es la de pruebas y compilación: al subir a `main`, GitHub Actions pasa las pruebas y construye el `.exe`.
 
-**Scrum Master y entrega:** el Scrum Master cambia en cada sprint: Juan José Ibáñez en el Sprint 1, Gonzalo Revuelta en el Sprint 2 e Itzel Fajardo en el Sprint 3. El Scrum Master del sprint revisa y fusiona las pull request en `develop` y en `main`, lleva el tablero y las actas y entrega el proyecto al profesor. Sergio García es el Product Owner.
+**Scrum Master y entrega:** el Scrum Master cambia en cada sprint: Juan José Ibáñez en el Sprint 1, Gonzalo Revuelta en el Sprint 2, Itzel Fajardo en el Sprint 3 y Sergio García en el Sprint 4 (acordado en el acta nº 12). El Scrum Master del sprint revisa y fusiona las pull request en `develop` y en `main`, lleva el tablero y las actas y entrega el proyecto al profesor. Sergio García es el Product Owner.
 
 **Issues #1 a #20:** una por tarea del backlog (T01 a T20), con su hito (Sprint 1 a 4, con fecha de fin), prioridad y responsable como etiquetas, y el texto de la tarea con su criterio de «hecho».
 
@@ -331,7 +332,7 @@ Con el módulo de datos real, una base de datos nueva y el simulador firmado com
 
 **Tablero Kanban:** https://github.com/users/JUANJOIC005/projects/1, con las 20 issues. Desde el 12/11/2026 sus columnas son las que pide la rúbrica: *Sprint Backlog · To Do · Doing · Done* (antes eran Por hacer · En curso · En revisión · Hecho). La captura de inicio del Sprint 2 se reconstruyó ese día con el historial de cambios de estado del tablero, porque no se hizo el 02/11, y la propia imagen lo indica. Las capturas se generan con `python3 scripts/kanban_captura.py <salida.png> "texto"`: dibuja el tablero real (código, título, responsable, horas y prioridad de cada tarea, totales por columna y fecha y hora de la captura). Siempre sale con la fecha real y no se retoca.
 
-**Actas:** se hacen con la plantilla de actas de AUREA AUDIT (`scripts/actas_pdf.py` genera las del Sprint 1). Las del Sprint 2 son la nº 04 a la 07, redactadas por el Scrum Master con la fecha, la hora, el lugar, los asistentes y los acuerdos de cada reunión, y firmadas por los cuatro.
+**Actas:** se hacen con la plantilla de actas de AUREA AUDIT (`scripts/actas_pdf.py` genera las del Sprint 1). Las del Sprint 2 son la nº 04 a la 07 y las del Sprint 3, la nº 08 a la 12, redactadas por el Scrum Master de cada sprint con la fecha, la hora, el lugar, los asistentes y los acuerdos de cada reunión, y firmadas por los cuatro.
 
 **Product Backlog y lista de requisitos:** el Product Backlog (Excel, con la plantilla del profesor) y la lista de requisitos (PDF) se actualizan al cierre de cada sprint y se entregan junto con el resto. Los de cada sprint se entregan con el resto: el Excel lleva una hoja de Sprint Backlog por sprint, las horas reales y la hoja de requisitos, y la lista de requisitos va también en PDF.
 
