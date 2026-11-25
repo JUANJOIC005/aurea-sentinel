@@ -104,7 +104,19 @@ def _tarjeta(conn, s: dict, ahora: datetime) -> dict:
     }
 
 
-def _resumen(conn, tarjetas: list[dict], sensores: list[dict]) -> dict:
+def _tareas_abiertas(conn, acceso: Acceso) -> int | None:
+    """Tareas sin terminar: las del equipo del Supervisor o las del propio Técnico."""
+    if acceso.ambito == "area":
+        sql = ("SELECT count(*) AS n FROM tarea t JOIN usuario u ON u.id = t.asignada_a"
+               " WHERE u.supervisor_id = ? AND t.estado <> 'hecha'")
+    elif acceso.ambito == "asignados":
+        sql = "SELECT count(*) AS n FROM tarea WHERE asignada_a = ? AND estado <> 'hecha'"
+    else:
+        return None
+    return conn.execute(sql, (acceso.usuario["id"],)).fetchone()["n"]
+
+
+def _resumen(conn, tarjetas: list[dict], sensores: list[dict], acceso: Acceso) -> dict:
     cuenta = {e: sum(1 for t in tarjetas if t["estado"] == e) for e in ("normal", "aviso", "alarma")}
     ids = [s["id"] for s in sensores]
     lecturas = validas = alarmas = 0
@@ -117,7 +129,7 @@ def _resumen(conn, tarjetas: list[dict], sensores: list[dict]) -> dict:
         alarmas = conn.execute(f"SELECT count(*) AS n FROM alarma WHERE sensor_id IN ({marcas})"
                                f" AND estado <> 'cerrada'", ids).fetchone()["n"]
     return {"sensores": len(sensores), "en_rango": cuenta["normal"], "en_aviso": cuenta["aviso"],
-            "en_alarma": cuenta["alarma"], "alarmas_activas": alarmas, "tareas_abiertas": None,
+            "en_alarma": cuenta["alarma"], "alarmas_activas": alarmas, "tareas_abiertas": _tareas_abiertas(conn, acceso),
             "lecturas_24h": lecturas, "validas_24h": validas,
             "pct_validas": round(100 * validas / lecturas, 1) if lecturas else None}
 
@@ -144,7 +156,7 @@ def ultimas(acceso: Acceso = Depends(requiere("lecturas", "ver"))):
             return _agregado_por_area(conn, ahora)
         sensores = _sensores(conn, acceso)
         tarjetas = [_tarjeta(conn, s, ahora) for s in sensores]
-        return {"sensores": tarjetas, "resumen": _resumen(conn, tarjetas, sensores)}
+        return {"sensores": tarjetas, "resumen": _resumen(conn, tarjetas, sensores, acceso)}
 
 
 # ── Histórico ──
@@ -235,7 +247,7 @@ def alarmas(filtro: Literal["activas", "hoy", "7dias"] = "activas",
 
 @router.get("/equipo")
 def equipo(acceso: Acceso = Depends(requiere("equipo", "ver"))):
-    """Los técnicos vinculados al Supervisor y los sensores que tiene asignados cada uno."""
+    """Los técnicos vinculados al Supervisor, sus sensores, sus tareas abiertas y su última actividad."""
     with db.conexion() as conn:
         tecnicos = conn.execute(
             "SELECT id, nombre, correo, ultimo_acceso FROM usuario WHERE supervisor_id = ? AND estado = 'activo'"
@@ -245,6 +257,15 @@ def equipo(acceso: Acceso = Depends(requiere("equipo", "ver"))):
                 "SELECT s.tag FROM asignacion_sensor x JOIN sensor s ON s.id = x.sensor_id"
                 " WHERE x.tecnico_id = ? ORDER BY s.id", (t["id"],))]
             t["ultimo_acceso"] = _iso(t["ultimo_acceso"])
+            cuenta = conn.execute("SELECT count(*) AS abiertas, coalesce(sum(estado = 'en_curso'), 0) AS en_curso"
+                                  " FROM tarea WHERE asignada_a = ? AND estado <> 'hecha'", (t["id"],)).fetchone()
+            t["tareas_abiertas"] = cuenta["abiertas"]
+            t["estado"] = "ocupado" if cuenta["en_curso"] else "disponible"
+            ultima = conn.execute(
+                "SELECT i.creada_en, i.tipo, s.tag FROM incidencia i JOIN sensor s ON s.id = i.sensor_id"
+                " WHERE i.tecnico_id = ? ORDER BY i.creada_en DESC, i.id DESC LIMIT 1", (t["id"],)).fetchone()
+            t["ultima_actividad"] = ({"instante": _iso(ultima["creada_en"]), "tipo": ultima["tipo"],
+                                      "sensor": ultima["tag"]} if ultima else None)
     return {"tecnicos": tecnicos}
 
 

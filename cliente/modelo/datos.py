@@ -3,6 +3,9 @@ from datetime import datetime, timezone
 
 ESTADOS = {"normal": "En rango", "aviso": "Aviso", "alarma": "Alarma", "sin_datos": "Sin datos"}
 NIVELES = {"aviso": "Aviso", "alarma": "Alarma"}
+PRIORIDADES = {"alta": "Alta", "media": "Media", "baja": "Baja"}
+ESTADOS_TAREA = {"pendiente": "Pendiente", "en_curso": "En curso", "hecha": "Hecha"}
+TIPOS_INCIDENCIA = {"inspeccion": "Inspección visual", "lectura_manual": "Lectura manual", "anomalia": "Anomalía"}
 
 
 def numero(valor: float | None, decimales: int | None = None) -> str:
@@ -37,6 +40,14 @@ def hora(texto: str | None) -> str:
 def fecha_hora(texto: str | None) -> str:
     f = fecha(texto)
     return f"{f:%d/%m/%Y %H:%M}" if f else "—"
+
+
+def dia(texto: str | None) -> str:
+    """«2026-11-20» (fecha límite de una tarea) → «20/11»."""
+    if not texto:
+        return "sin fecha"
+    anio, mes, dia_ = texto[:10].split("-")
+    return f"{dia_}/{mes}"
 
 
 def a_utc_iso(momento: datetime) -> str:

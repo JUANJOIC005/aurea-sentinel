@@ -17,6 +17,7 @@ ANCHO_DOS_COLUMNAS = 1000       # por debajo, las tarjetas de sensor pasan a dos
 class VistaPanel(QWidget):
     abrir_historico = Signal(str)       # tag
     filtro_alarmas = Signal(str)        # activas | hoy | 7dias
+    asignar_tarea = Signal()            # ir a «Equipo y tareas» (ventana 06)
 
     def __init__(self, area_texto: str, parent=None):
         super().__init__(parent)
@@ -112,7 +113,7 @@ class VistaPanel(QWidget):
         self.sin_alarmas = etiqueta("", "Suave")
         self.sin_alarmas.setAlignment(Qt.AlignmentFlag.AlignCenter)
         caja.addWidget(self.sin_alarmas)
-        caja.addWidget(etiqueta("Reconocer una alarma se podrá hacer desde el Sprint 3 (T15).", "Suave"))
+        caja.addWidget(etiqueta("Reconoce las alarmas abiertas desde la sección «Alarmas».", "Suave"))
         return tarjeta
 
     def _tarjeta_equipo(self, area_texto: str) -> QFrame:
@@ -126,8 +127,8 @@ class VistaPanel(QWidget):
         cabecera.addStretch(1)
         asignar = QPushButton("+ Asignar tarea")
         asignar.setObjectName("Primario")
-        asignar.setEnabled(False)
-        asignar.setToolTip("Asignar tareas llega en el Sprint 3 (T15 y T17).")
+        asignar.setToolTip("Abre «Equipo y tareas» para asignar una tarea a un técnico de tu equipo.")
+        asignar.clicked.connect(self.asignar_tarea)
         cabecera.addWidget(asignar)
         self.caja_equipo.addLayout(cabecera)
         self.lista_equipo = QVBoxLayout()
@@ -168,7 +169,9 @@ class VistaPanel(QWidget):
             ", ".join(f"{s['tag']} · {s['alarma']}" for s in activas[:2]) if resumen["alarmas_activas"] else
             "Ninguna activa",
             estilos.AVISO if resumen["alarmas_activas"] else None)
-        self.kpi_tareas.poner("—", "Las tareas llegan en el Sprint 3 (T15)")
+        abiertas = resumen.get("tareas_abiertas")
+        self.kpi_tareas.poner("—" if abiertas is None else str(abiertas),
+                              "Pendientes o en curso en tu equipo" if abiertas is not None else "Sin datos de tareas")
         pct = resumen["pct_validas"]
         self.kpi_validas.poner(f"{datos.numero(pct, 1)}<span style='font-size:14px'> %</span>" if pct is not None else "—",
                                f"{datos.numero(resumen['lecturas_24h'], 0)} medidas en 24 h")

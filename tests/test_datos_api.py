@@ -68,7 +68,7 @@ def test_el_resumen_cuenta_sensores_en_rango_aviso_y_alarma(central, conexion, p
     ayudas.abrir_alarma(conexion, "PT-102", "alarma", 161.0)
     r = pedir("laura", "/lecturas/ultimas").json()["resumen"]
     assert (r["sensores"], r["en_rango"], r["en_aviso"], r["en_alarma"]) == (4, 2, 1, 1)
-    assert r["alarmas_activas"] == 1 and r["tareas_abiertas"] is None
+    assert r["alarmas_activas"] == 1 and r["tareas_abiertas"] == 0
     assert r["lecturas_24h"] == 4 * 24 + 2 and r["pct_validas"] == 100.0
 
 
